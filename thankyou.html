@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>אישור תשלום</title>
+<link rel="stylesheet" href="styles.css" />
+<style>
+    .status {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      font-size: 20px;
+      font-weight: bold;
+      color: #162148;
+      margin-bottom: 1rem;
+      padding: 1rem;
+      border-radius: 8px;
+    }
+    .status.success {
+      background-color: #f0fdf4;
+      color: #15803d;
+    }
+    .status svg {
+      flex-shrink: 0;
+    }
+    .sub {
+      text-align: center;
+      color: #666;
+      margin-bottom: 2rem;
+      font-size: 14px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 0.75rem 1.5rem;
+      margin-bottom: 2rem;
+      text-align: right;
+      background: #f7f7f7;
+      padding: 1.5rem;
+      border-radius: 6px;
+    }
+    .grid .label {
+      font-weight: 600;
+      color: #162148;
+      font-size: 14px;
+    }
+    .grid .val {
+      color: #333;
+      font-size: 14px;
+    }
+    .stack {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+</style>
+</head>
+<body>
+<header>
+<img src="HeaderLogo.jpg" alt="שערי צדק" />
+</header>
+ 
+  <h1 class="page-title">סיכום תשלום</h1>
+ 
+  <main class="form-container">
+<section>
+<div class="status success">
+<svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+<circle cx="12" cy="12" r="11" stroke="currentColor" stroke-width="2"/>
+<path d="M7 12.5l3.5 3L17 8.5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+        התשלום התקבל בהצלחה
+</div>
+<p class="sub">שמרו את האישור אצלכם. ניתן להדפיס או לשמור כקובץ.</p>
+ 
+      <div class="grid">
+<div class="label">מספר עסקה (Tranzila):</div>
+<div class="val" id="tranid">—</div>
+<div class="label">מס׳ אשפוז (Order ID):</div>
+<div class="val" id="orderid">—</div>
+<div class="label">סכום ששולם:</div>
+<div class="val"><span id="sum">—</span> ₪</div>
+<div class="label">תאריך ושעה:</div>
+<div class="val" id="when">—</div>
+</div>
+ 
+      <div class="stack">
+<button class="light-btn" id="btnPrint">הדפס / שמור PDF</button>
+<button class="light-btn" id="btnSave">שמור קבלה (HTML)</button>
+</div>
+</section>
+</main>
+ 
+  <footer>
+<img src="FooterLogo.png" alt="שערי צדק" />
+</footer>
+ 
+  <script>
+    (function(){
+      var qs = new URLSearchParams(window.location.search);
+      var tranid = qs.get('tranid') || qs.get('tran_id') || '';
+      var orderid = qs.get('orderid') || qs.get('order_id') || '';
+      var sum = qs.get('sum') || qs.get('amount') || '';
+ 
+      if(tranid) document.getElementById('tranid').textContent = tranid;
+      if(orderid) document.getElementById('orderid').textContent = orderid;
+      if(sum) document.getElementById('sum').textContent = sum;
+ 
+      document.getElementById('when').textContent = new Date().toLocaleString('he-IL');
+ 
+      document.getElementById('btnPrint').addEventListener('click', function(){
+        window.print();
+      });
+ 
+      document.getElementById('btnSave').addEventListener('click', function(){
+        var html = '<!DOCTYPE html><meta charset="utf-8">' +
+          '<h2>אישור תשלום</h2>' +
+          '<p><strong>מספר עסקה (Tranzila):</strong> ' + (tranid || '') + '</p>' +
+          '<p><strong>מס׳ אשפוז (Order ID):</strong> ' + (orderid || '') + '</p>' +
+          '<p><strong>סכום ששולם:</strong> ' + (sum || '') + ' ₪</p>' +
+          '<p><strong>תאריך ושעה:</strong> ' + new Date().toLocaleString('he-IL') + '</p>';
+ 
+        var blob = new Blob([html], {type: 'text/html;charset=utf-8'});
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'receipt_' + (tranid || orderid || 'payment') + '.html';
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 100);
+      });
+    })();
+</script>
+</body>
+</html>

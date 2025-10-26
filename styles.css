@@ -1,0 +1,261 @@
+/* styles.css */
+body {
+    font-family: Arial, sans-serif;
+    background: #f7f7f7;
+    margin: 0;
+    padding: 0;
+    direction: rtl;
+    text-align: center;
+}
+ 
+header {
+    background: #ffffff;
+    padding: 1rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+ 
+header img {
+    max-height: 80px;
+}
+ 
+.page-title {
+    background: #ffffff;
+    padding: 2rem 1rem;
+    margin: 0;
+    font-size: 24px;
+    font-weight: bold;
+    color: #162148;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+ 
+.page-title span {
+    color: #162148;
+}
+ 
+.form-container {
+    max-width: 600px;
+    margin: 2rem auto;
+    background: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+ 
+.form-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #162148;
+    text-align: right;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #1e40af;
+    padding-bottom: 0.5rem;
+}
+ 
+.form-group {
+    margin-bottom: 1.5rem;
+    text-align: right;
+}
+ 
+label {
+    display: block;
+    font-weight: 500;
+    color: #162148;
+    margin-bottom: 0.5rem;
+    font-size: 14px;
+}
+ 
+input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #d0d0d0;
+    border-radius: 6px;
+    font-size: 14px;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+    direction: rtl;
+    text-align: right;
+}
+ 
+input:focus {
+    outline: none;
+    border-color: #1e40af;
+    box-shadow: 0 0 5px rgba(30, 64, 175, 0.3);
+}
+ 
+input.error {
+    border-color: #dc2626;
+    background-color: #fef2f2;
+}
+ 
+.error-message {
+    color: #dc2626;
+    font-size: 12px;
+    margin-top: 0.25rem;
+    text-align: right;
+}
+ 
+.light-btn {
+    background: #1e40af;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 0.75rem 2rem;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 1rem;
+    transition: background 0.3s;
+}
+ 
+.light-btn:hover {
+    background: #162148;
+}
+ 
+.iframe-container {
+    max-width: 600px;
+    margin: 2rem auto;
+    background: #fff;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+ 
+iframe {
+    width: 100%;
+    height: 600px;
+    border: none;
+    display: block;
+}
+ 
+.iframe-back-link {
+    display: block;
+    text-align: right;
+    margin-top: 1rem;
+    color: #666;
+    font-size: 13px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+ 
+.iframe-back-link:hover {
+    color: #1e40af;
+}
+ 
+footer {
+    background: #ffffff;
+    padding: 2rem 1rem;
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+    margin-top: 2rem;
+}
+ 
+footer img {
+    max-height: 80px;
+}
+ 
+/* סטטוס הצלחה/כשלון */
+.status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    font-size: 20px;
+    font-weight: bold;
+    color: #162148;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border-radius: 8px;
+}
+ 
+.status.success {
+    background-color: #f0fdf4;
+    color: #15803d;
+}
+ 
+.status.err {
+    background-color: #fef2f2;
+    color: #dc2626;
+}
+ 
+.status svg {
+    flex-shrink: 0;
+}
+ 
+.sub {
+    text-align: center;
+    color: #666;
+    margin-bottom: 2rem;
+    font-size: 14px;
+    line-height: 1.6;
+}
+ 
+/* טבלת מידע */
+.grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.75rem 1.5rem;
+    margin-bottom: 2rem;
+    text-align: right;
+    background: #f7f7f7;
+    padding: 1.5rem;
+    border-radius: 6px;
+}
+ 
+.grid .label {
+    font-weight: 600;
+    color: #162148;
+    font-size: 14px;
+}
+ 
+.grid .val {
+    color: #333;
+    font-size: 14px;
+}
+ 
+/* כפתורים בשורה אחת */
+.stack {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    justify-content: center;
+}
+ 
+.stack .light-btn {
+    flex: 1;
+    margin-top: 0;
+}
+ 
+/* כפתור משני */
+.btn {
+    padding: 0.75rem 2rem;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-family: Arial, sans-serif;
+}
+ 
+.btn.print {
+    background: #f3f4f6;
+    color: #162148;
+    border: 1px solid #d0d0d0;
+    flex: 1;
+}
+ 
+.btn.print:hover {
+    background: #e5e7eb;
+}
+ 
+/* מובייל */
+@media (max-width: 600px) {
+    .stack {
+        flex-direction: column;
+    }
+    .stack .light-btn,
+    .btn.print {
+        width: 100%;
+    }
+}

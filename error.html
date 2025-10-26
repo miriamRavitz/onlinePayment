@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>התשלום נכשל</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .status {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      font-size: 20px;
+      font-weight: bold;
+      color: #162148;
+      margin-bottom: 1rem;
+      padding: 1rem;
+      border-radius: 8px;
+    }
+    .status.err {
+      background-color: #fef2f2;
+      color: #dc2626;
+    }
+    .status svg {
+      flex-shrink: 0;
+    }
+    .sub {
+      text-align: center;
+      color: #666;
+      margin-bottom: 2rem;
+      font-size: 14px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 0.75rem 1.5rem;
+      margin-bottom: 2rem;
+      text-align: right;
+      background: #f7f7f7;
+      padding: 1.5rem;
+      border-radius: 6px;
+    }
+    .grid .label {
+      font-weight: 600;
+      color: #162148;
+      font-size: 14px;
+    }
+    .grid .val {
+      color: #333;
+      font-size: 14px;
+    }
+    .stack {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .btn {
+      padding: 0.75rem 2rem;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-family: Arial, sans-serif;
+    }
+    .btn.retry {
+      background: #1e40af;
+      color: white;
+    }
+    .btn.retry:hover {
+      background: #162148;
+    }
+    .btn.print {
+      background: #f3f4f6;
+      color: #162148;
+      border: 1px solid #d0d0d0;
+    }
+    .btn.print:hover {
+      background: #e5e7eb;
+    }
+  </style>
+</head>
+<body>
+  <header>
+     <img src="HeaderLogo.jpg" alt="שערי צדק" />
+  </header>
+
+  <h1 class="page-title">סיכום תשלום</h1>
+
+  <main class="form-container">
+    <section>
+      <div class="status err">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle cx="12" cy="12" r="11" stroke="currentColor" stroke-width="2"/>
+          <path d="M8 8l8 8M16 8l-8 8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+        </svg>
+        התשלום לא הושלם
+      </div>
+      <p class="sub">נא בדקו את פרטי האשראי או נסו שוב מאוחר יותר.</p>
+
+     
+
+    
+    </section>
+  </main>
+
+  <footer>
+    <img src="FooterLogo.png" alt="שערי צדק" />
+  </footer>
+
+  <script>
+    (function(){
+      var qs = new URLSearchParams(window.location.search);
+      var orderid = qs.get('orderid') || '';
+      var sum = qs.get('sum') || '';
+      var err = qs.get('error') || qs.get('code') || '';
+
+      document.getElementById('orderid').textContent = orderid || '—';
+      document.getElementById('sum').textContent = sum || '—';
+      document.getElementById('err').textContent = err || '—';
+
+      document.getElementById('btnPrint').addEventListener('click', function(){
+        window.print();
+      });
+
+      document.getElementById('retry').addEventListener('click', function(){
+        var url = 'index.html?hospitalization=' + encodeURIComponent(orderid || '') +
+                  '&amount=' + encodeURIComponent(sum || '');
+        window.location.href = url;
+      });
+    })();
+  </script>
+</body>
+</html>
