@@ -98,33 +98,49 @@
 </footer>
  
   <script>
-    (function(){
-        const hash = window.location.hash.substring(1);
-        const params = new URLSearchParams(hash);
-      //var qs = new URLSearchParams(window.location.search);
-        var qs=params;
-      var tranid = qs.get('tranid') || qs.get('tran_id') || '';
-      var orderid = qs.get('orderid') || qs.get('order_id') || '';
+        (function(){
+      // תמיכה גם ב-query string וגם ב-hash (לגיבוי)
+      var qs = new URLSearchParams(window.location.search);
+     
+      // אם אין פרמטרים ב-query string, נסה לקרוא מה-hash
+      if (!qs.toString() && window.location.hash) {
+        qs = new URLSearchParams(window.location.hash.substring(1));
+      }
+     
+      var tranid = qs.get('tranid') || qs.get('tran_id') || qs.get('TranzilaTK') || '';
+      var orderid = qs.get('orderid') || qs.get('order_id') || qs.get('hospitalization') || '';
       var sum = qs.get('sum') || qs.get('amount') || '';
- 
+      var response = qs.get('Response') || qs.get('response') || '';
+
+      // אם יש Response=000 זה הצלחה
+      if (response && response !== '000') {
+        // אם התשובה לא 000, זו שגיאה - העבר לדף שגיאה
+        window.location.href = 'error.html' + window.location.search;
+        return;
+      }
+
       if(tranid) document.getElementById('tranid').textContent = tranid;
       if(orderid) document.getElementById('orderid').textContent = orderid;
       if(sum) document.getElementById('sum').textContent = sum;
- 
+
       document.getElementById('when').textContent = new Date().toLocaleString('he-IL');
- 
+
+      // הדפסה / שמירה כ-PDF
       document.getElementById('btnPrint').addEventListener('click', function(){
         window.print();
       });
- 
+
+      // שמירת קבלה כ-HTML
       document.getElementById('btnSave').addEventListener('click', function(){
-        var html = '<!DOCTYPE html><meta charset="utf-8">' +
-          '<h2>אישור תשלום</h2>' +
-          '<p><strong>מספר עסקה (Tranzila):</strong> ' + (tranid || '') + '</p>' +
-          '<p><strong>מס׳ אשפוז (Order ID):</strong> ' + (orderid || '') + '</p>' +
-          '<p><strong>סכום ששולם:</strong> ' + (sum || '') + ' ₪</p>' +
-          '<p><strong>תאריך ושעה:</strong> ' + new Date().toLocaleString('he-IL') + '</p>';
- 
+        var html = '<!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="utf-8"></head><body style="font-family:Arial;padding:2rem;direction:rtl;text-align:right;">' +
+          '<h2 style="color:#162148;">אישור תשלום - שערי צדק</h2>' +
+          '<div style="background:#f7f7f7;padding:1.5rem;border-radius:8px;margin:1rem 0;">' +
+          '<p><strong>מספר עסקה (Tranzila):</strong> ' + (tranid || '—') + '</p>' +
+          '<p><strong>מס׳ אשפוז (Order ID):</strong> ' + (orderid || '—') + '</p>' +
+          '<p><strong>סכום ששולם:</strong> ' + (sum || '—') + ' ₪</p>' +
+          '<p><strong>תאריך ושעה:</strong> ' + new Date().toLocaleString('he-IL') + '</p>' +
+          '</div></body></html>';
+
         var blob = new Blob([html], {type: 'text/html;charset=utf-8'});
         var a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
@@ -134,7 +150,7 @@
         setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 100);
       });
     })();
+
 </script>
 </body>
-
 </html>
