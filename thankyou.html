@@ -118,10 +118,7 @@
       console.log('Parsed values:', {tranid, orderid, sum, response});
 
       // אם יש Response ושונה מ-000, זו שגיאה
-      if (response && response !== '000') {
-        window.location.href = 'error.html' + window.location.search;
-        return;
-      }
+     
 
       if(tranid) document.getElementById('tranid').textContent = tranid;
       if(orderid) document.getElementById('orderid').textContent = orderid;
@@ -158,4 +155,5 @@
 </body>
 
 </html>
+
 
