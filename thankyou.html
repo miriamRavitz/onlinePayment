@@ -99,7 +99,10 @@
  
   <script>
     (function(){
-      var qs = new URLSearchParams(window.location.search);
+        const hash = window.location.hash.substring(1);
+        const params = new URLSearchParams(hash);
+      //var qs = new URLSearchParams(window.location.search);
+        var qs=params;
       var tranid = qs.get('tranid') || qs.get('tran_id') || '';
       var orderid = qs.get('orderid') || qs.get('order_id') || '';
       var sum = qs.get('sum') || qs.get('amount') || '';
@@ -133,4 +136,5 @@
     })();
 </script>
 </body>
+
 </html>
