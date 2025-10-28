@@ -115,8 +115,8 @@
       // אם יש Response=000 זה הצלחה
       if (response && response !== '000') {
         // אם התשובה לא 000, זו שגיאה - העבר לדף שגיאה
-        window.location.href = 'error.html' + window.location.search;
-        return;
+        //window.location.href = 'error.html' + window.location.search;
+        //return;
       }
 
       if(tranid) document.getElementById('tranid').textContent = tranid;
@@ -147,10 +147,11 @@
         a.download = 'receipt_' + (tranid || orderid || 'payment') + '.html';
         document.body.appendChild(a);
         a.click();
-        setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 100);
+       // setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 100);
       });
     })();
 
 </script>
 </body>
 </html>
+
