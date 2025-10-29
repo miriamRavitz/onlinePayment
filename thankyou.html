@@ -210,6 +210,7 @@
     qs = new URLSearchParams(window.location.search);
   }
   
+  console.log(qs.toString());
   var tranid = qs.get('Tempref') || qs.get('tranid') || qs.get('TranzilaTK') || '';
   var orderid = qs.get('hospitalization') || qs.get('orderid') || qs.get('order_id') || '';
   var sum = qs.get('sum') || qs.get('amount') || '';
@@ -247,8 +248,8 @@
       '<div class="title">אישור תשלום - שערי צדק</div>' +
       '<div class="status">✓ התשלום התקבל בהצלחה</div>' +
       '<div class="grid">' +
-      '<p><strong>מספר עסקה (Tranzila):</strong> ' + (tranid || '—') + '</p>' +
-      '<p><strong>מס׳ אשפוז (Order ID):</strong> ' + (orderid || '—') + '</p>' +
+      '<p><strong>מספר שובר שב"א:</strong> ' + ( tranid || '—') + '</p>' +
+      '<p><strong>מס׳ אשפוז :</strong> ' + (orderid || '—') + '</p>' +
       '<p><strong>סכום ששולם:</strong> ' + (sum || '—') + ' ₪</p>' +
       '<p><strong>תאריך ושעה:</strong> ' + new Date().toLocaleString('he-IL') + '</p>' +
       '</div></div>' +
