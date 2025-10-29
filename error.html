@@ -6,6 +6,63 @@
   <title>התשלום נכשל</title>
   <link rel="stylesheet" href="styles.css" />
   <style>
+    /* סגנונות למסך */
+    @media screen {
+      body {
+        background: transparent !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      
+      header, footer {
+        display: none !important;
+      }
+      
+      .page-title {
+        display: none !important;
+      }
+      
+      .form-container {
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 1.5rem !important;
+        box-shadow: none !important;
+        background: transparent !important;
+      }
+    }
+
+    /* סגנונות להדפסה */
+    @media print {
+      body {
+        background: white !important;
+        padding: 2rem !important;
+      }
+      
+      header, footer {
+        display: block !important;
+      }
+      
+      header img, footer img {
+        max-height: 60px;
+      }
+      
+      .page-title {
+        display: block !important;
+        font-size: 22px;
+        padding: 1rem 0;
+        text-align: center;
+        border-bottom: 2px solid #162148;
+        margin-bottom: 1.5rem;
+      }
+      
+      .form-container {
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 1.5rem !important;
+        box-shadow: none !important;
+      }
+    }
+
     .status {
       display: flex;
       align-items: center;
@@ -30,55 +87,7 @@
       color: #666;
       margin-bottom: 2rem;
       font-size: 14px;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: auto 1fr;
-      gap: 0.75rem 1.5rem;
-      margin-bottom: 2rem;
-      text-align: right;
-      background: #f7f7f7;
-      padding: 1.5rem;
-      border-radius: 6px;
-    }
-    .grid .label {
-      font-weight: 600;
-      color: #162148;
-      font-size: 14px;
-    }
-    .grid .val {
-      color: #333;
-      font-size: 14px;
-    }
-    .stack {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-    .btn {
-      padding: 0.75rem 2rem;
-      border: none;
-      border-radius: 6px;
-      font-weight: bold;
-      font-size: 14px;
-      cursor: pointer;
-      transition: all 0.3s;
-      font-family: Arial, sans-serif;
-    }
-    .btn.retry {
-      background: #1e40af;
-      color: white;
-    }
-    .btn.retry:hover {
-      background: #162148;
-    }
-    .btn.print {
-      background: #f3f4f6;
-      color: #162148;
-      border: 1px solid #d0d0d0;
-    }
-    .btn.print:hover {
-      background: #e5e7eb;
+      line-height: 1.6;
     }
   </style>
 </head>
@@ -98,11 +107,7 @@
         </svg>
         התשלום לא הושלם
       </div>
-      <p class="sub">נא בדקו את פרטי האשראי או נסו שוב מאוחר יותר.</p>
-
-     
-
-    
+      <p class="sub">העסקה נכשלה.<br>יש לנסות להיכנס שוב לקישור שקיבלתם בהודעה.</p>
     </section>
   </main>
 
@@ -111,27 +116,28 @@
   </footer>
 
   <script>
-  /*  (function(){
-      var qs = new URLSearchParams(window.location.search);
-      var orderid = qs.get('orderid') || '';
-      var sum = qs.get('sum') || '';
-      var err = qs.get('error') || qs.get('code') || '';
-
-      document.getElementById('orderid').textContent = orderid || '—';
-      document.getElementById('sum').textContent = sum || '—';
-      document.getElementById('err').textContent = err || '—';
-
-      document.getElementById('btnPrint').addEventListener('click', function(){
-        window.print();
-      });
-
-      document.getElementById('retry').addEventListener('click', function(){
-        var url = 'index.html?hospitalization=' + encodeURIComponent(orderid || '') +
-                  '&amount=' + encodeURIComponent(sum || '');
-        window.location.href = url;
-      });
-    })();*/
+    (function(){
+      // יציאה מ-iframe - פתיחה בדף נפרד
+      if (window.top !== window.self) {
+        window.top.location.href = window.location.href;
+      }
+      
+      // פענוח כפול של ה-URL כי Tranzila מקודד פעמיים
+      var fullUrl = decodeURIComponent(window.location.search);
+      var qs = new URLSearchParams(fullUrl.startsWith('?') ? fullUrl.substring(1) : fullUrl);
+      
+      // ניסיון נוסף - אם זה לא עבד, נסה את הדרך הרגילה
+      if (!qs.get('Response')) {
+        qs = new URLSearchParams(window.location.search);
+      }
+      
+      var response = qs.get('Response') || qs.get('response') || '';
+      var orderid = qs.get('hospitalization') || qs.get('orderid') || qs.get('order_id') || '';
+      
+      console.log('Error page - Response code:', response);
+      console.log('Order ID:', orderid);
+      console.log('Full URL:', window.location.href);
+    })();
   </script>
 </body>
 </html>
-
