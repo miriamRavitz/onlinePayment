@@ -7,29 +7,7 @@
   <link rel="stylesheet" href="styles.css" />
   <style>
     /* סגנונות למסך */
-    @media screen {
-      body {
-        background: transparent !important;
-        padding: 0 !important;
-        margin: 0 !important;
-      }
-      
-      header, footer {
-        display: none !important;
-      }
-      
-      .page-title {
-        display: none !important;
-      }
-      
-      .form-container {
-        max-width: 100% !important;
-        margin: 0 !important;
-        padding: 1.5rem !important;
-        box-shadow: none !important;
-        background: transparent !important;
-      }
-    }
+  
 
     /* סגנונות להדפסה */
     @media print {
@@ -118,7 +96,9 @@
   <script>
     (function(){
       // יציאה מ-iframe - פתיחה בדף נפרד
-   
+      if (window.top !== window.self) {
+        window.top.location.href = window.location.href;
+      }
       
       // פענוח כפול של ה-URL כי Tranzila מקודד פעמיים
       var fullUrl = decodeURIComponent(window.location.search);
