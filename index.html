@@ -69,6 +69,9 @@
    const hospDate = params.get('hospDate') || '';
     // הצגת מספר האשפוז בכותרת
     document.getElementById('hospitalizationNumber').textContent = hosp;
+     document.getElementById('hospDate').textContent = hospDate;
+      document.getElementById('amount').textContent = amount;
+       document.getElementById('patientName').textContent = patientName;
 
       if (history.replaceState) {
           history.replaceState({}, document.title, window.location.pathname);
