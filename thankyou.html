@@ -99,6 +99,10 @@
  
   <script>
      (function(){
+
+     if (window.top !== window.self) {
+    window.top.location.href = window.location.href;
+  }
       // פענוח כפול של ה-URL כי Tranzila מקודד פעמיים
       var fullUrl = decodeURIComponent(window.location.search);
       
@@ -155,5 +159,6 @@
 </body>
 
 </html>
+
 
 
