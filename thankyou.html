@@ -140,11 +140,13 @@
     .grid .label {
       font-weight: 600;
       color: #162148;
-      font-size: 14px;
+      font-size: 16px;
+      font-weight: bold;
     }
     .grid .val {
       color: #333;
-      font-size: 14px;
+      font-size: 16px;
+      font-weight: bold;
     }
     .stack {
       display: flex;
@@ -173,12 +175,14 @@
 </svg>
 התשלום התקבל בהצלחה
 </div>
-<p class="sub">שמרו את האישור אצלכם. ניתן להדפיס או לשמור כקובץ.</p>
+<p class="sub" >קבלה תשלח בדוא"ל בתוך כמה ימים.</p>
  
 <div class="grid">
-<div class="label">מספר עסקה (Tranzila):</div>
+<div class="label">מספר שובר שב"א :</div>
 <div class="val" id="tranid">—</div>
-<div class="label">מס׳ אשפוז (Order ID):</div>
+<div class="label">4 ספרות אחרונות:</div> 
+<div class="val" id="ccno">—</div>
+<div class="label">מס׳ אשפוז :</div>
 <div class="val" id="orderid">—</div>
 <div class="label">סכום ששולם:</div>
 <div class="val"><span id="sum">—</span> ₪</div>
@@ -188,7 +192,7 @@
  
 <div class="stack">
 <button class="light-btn" id="btnPrint">הדפס / שמור PDF</button>
-<button class="light-btn" id="btnSave">שמור קבלה (HTML)</button>
+<button class="light-btn" id="btnSave">שמור אישור תשלום (HTML)</button>
 </div>
 </section>
 </main>
@@ -215,7 +219,7 @@
   var orderid = qs.get('hospitalization') || qs.get('orderid') || qs.get('order_id') || '';
   var sum = qs.get('sum') || qs.get('amount') || '';
   var response = qs.get('Response') || qs.get('response') || '';
-
+  var ccno=qs.get('ccno') || ''; 
   console.log('Parsed values:', {tranid, orderid, sum, response});
 
   if(tranid) document.getElementById('tranid').textContent = tranid;
@@ -249,6 +253,7 @@
       '<div class="status">✓ התשלום התקבל בהצלחה</div>' +
       '<div class="grid">' +
       '<p><strong>מספר שובר שב"א:</strong> ' + ( tranid || '—') + '</p>' +
+       '<p><strong>4 ספרות אחרונות:</strong> ' + ( ccno || '—') + '</p>' +
       '<p><strong>מס׳ אשפוז :</strong> ' + (orderid || '—') + '</p>' +
       '<p><strong>סכום ששולם:</strong> ' + (sum || '—') + ' ₪</p>' +
       '<p><strong>תאריך ושעה:</strong> ' + new Date().toLocaleString('he-IL') + '</p>' +
