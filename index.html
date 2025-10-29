@@ -67,6 +67,11 @@
     const amount = params.get('amount') || '';
     const patientName = params.get('patientName') || '';
    const hospDate = params.get('hospDate') || '';
+
+   console.log('hospitalization:', hosp);
+   console.log('amount:', amount);
+    console.log('patientName:', patientName);
+    console.log('hospDate:', hospDate);
     // הצגת מספר האשפוז בכותרת
     document.getElementById('hospitalizationNumber').textContent = hosp;
      document.getElementById('hospDate').textContent = hospDate;
