@@ -6,67 +6,6 @@
 <title>אישור תשלום</title>
 <link rel="stylesheet" href="styles.css" />
 <style>
-    /* סגנונות למסך */
-    @media screen {
-      body {
-        background: transparent !important;
-        padding: 0 !important;
-        margin: 0 !important;
-      }
-      
-      header, footer {
-        display: none !important;
-      }
-      
-      .page-title {
-        display: none !important;
-      }
-      
-      .form-container {
-        max-width: 100% !important;
-        margin: 0 !important;
-        padding: 1.5rem !important;
-        box-shadow: none !important;
-        background: transparent !important;
-      }
-    }
-
-    /* סגנונות להדפסה */
-    @media print {
-      body {
-        background: white !important;
-        padding: 2rem !important;
-      }
-      
-      header, footer {
-        display: block !important;
-      }
-      
-      header img, footer img {
-        max-height: 60px;
-      }
-      
-      .page-title {
-        display: block !important;
-        font-size: 22px;
-        padding: 1rem 0;
-        text-align: center;
-        border-bottom: 2px solid #162148;
-        margin-bottom: 1.5rem;
-      }
-      
-      .form-container {
-        max-width: 100% !important;
-        margin: 0 !important;
-        padding: 1.5rem !important;
-        box-shadow: none !important;
-      }
-      
-      .stack {
-        display: none !important;
-      }
-    }
-
     .status {
       display: flex;
       align-items: center;
@@ -113,12 +52,8 @@
     }
     .stack {
       display: flex;
-      flex-direction: row;
+      flex-direction: column;
       gap: 1rem;
-      justify-content: center;
-    }
-    .stack .light-btn {
-      flex: 1;
     }
 </style>
 </head>
@@ -127,20 +62,20 @@
 <img src="HeaderLogo.jpg" alt="שערי צדק" />
 </header>
  
-<h1 class="page-title">סיכום תשלום</h1>
+  <h1 class="page-title">סיכום תשלום</h1>
  
-<main class="form-container">
+  <main class="form-container">
 <section>
 <div class="status success">
 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
 <circle cx="12" cy="12" r="11" stroke="currentColor" stroke-width="2"/>
 <path d="M7 12.5l3.5 3L17 8.5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
-התשלום התקבל בהצלחה
+        התשלום התקבל בהצלחה
 </div>
 <p class="sub">שמרו את האישור אצלכם. ניתן להדפיס או לשמור כקובץ.</p>
  
-<div class="grid">
+      <div class="grid">
 <div class="label">מספר עסקה (Tranzila):</div>
 <div class="val" id="tranid">—</div>
 <div class="label">מס׳ אשפוז (Order ID):</div>
@@ -151,89 +86,82 @@
 <div class="val" id="when">—</div>
 </div>
  
-<div class="stack">
+      <div class="stack">
 <button class="light-btn" id="btnPrint">הדפס / שמור PDF</button>
 <button class="light-btn" id="btnSave">שמור קבלה (HTML)</button>
 </div>
 </section>
 </main>
  
-<footer>
+  <footer>
 <img src="FooterLogo.png" alt="שערי צדק" />
 </footer>
  
-<script>
-(function(){
-  // יציאה מ-iframe אם נמצאים בתוכו
-  if (window.top !== window.self) {
+  <script>
+     (function(){
+
+     if (window.top !== window.self) {
     window.top.location.href = window.location.href;
   }
-  
-  // פענוח כפול של ה-URL כי Tranzila מקודד פעמיים
-  var fullUrl = decodeURIComponent(window.location.search);
-  
-  // יצירת query string מהנתונים המפוענחים
-  var qs = new URLSearchParams(fullUrl.startsWith('?') ? fullUrl.substring(1) : fullUrl);
-  
-  // ניסיון נוסף - אם זה לא עבד, נסה את הדרך הרגילה
-  if (!qs.get('Response')) {
-    qs = new URLSearchParams(window.location.search);
-  }
-  
-  var tranid = qs.get('Tempref') || qs.get('tranid') || qs.get('TranzilaTK') || '';
-  var orderid = qs.get('hospitalization') || qs.get('orderid') || qs.get('order_id') || '';
-  var sum = qs.get('sum') || qs.get('amount') || '';
-  var response = qs.get('Response') || qs.get('response') || '';
+      // פענוח כפול של ה-URL כי Tranzila מקודד פעמיים
+      var fullUrl = decodeURIComponent(window.location.search);
+      
+      // יצירת query string מהנתונים המפוענחים
+      var qs = new URLSearchParams(fullUrl.startsWith('?') ? fullUrl.substring(1) : fullUrl);
+      
+      // ניסיון נוסף - אם זה לא עבד, נסה את הדרך הרגילה
+      if (!qs.get('Response')) {
+        qs = new URLSearchParams(window.location.search);
+      }
+      
+      if (history.replaceState) {
+          history.replaceState({}, document.title, window.location.pathname);
+      }
+      var tranid = qs.get('Tempref') || qs.get('tranid') || qs.get('TranzilaTK') || '';
+      var orderid = qs.get('hospitalization') || qs.get('orderid') || qs.get('order_id') || '';
+      var sum = qs.get('sum') || qs.get('amount') || '';
+      var response = qs.get('Response') || qs.get('response') || '';
 
-  console.log('Parsed values:', {tranid, orderid, sum, response});
+      console.log('Parsed values:', {tranid, orderid, sum, response});
 
-  if(tranid) document.getElementById('tranid').textContent = tranid;
-  if(orderid) document.getElementById('orderid').textContent = orderid;
-  if(sum) document.getElementById('sum').textContent = sum;
+      // אם יש Response ושונה מ-000, זו שגיאה
+     
 
-  document.getElementById('when').textContent = new Date().toLocaleString('he-IL');
+      if(tranid) document.getElementById('tranid').textContent = tranid;
+      if(orderid) document.getElementById('orderid').textContent = orderid;
+      if(sum) document.getElementById('sum').textContent = sum;
 
-  // הדפסה / שמירה כ-PDF
-  document.getElementById('btnPrint').addEventListener('click', function(){
-    window.print();
-  });
+      document.getElementById('when').textContent = new Date().toLocaleString('he-IL');
 
-  // שמירת קבלה כ-HTML
-  document.getElementById('btnSave').addEventListener('click', function(){
-    var html = '<!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="utf-8">' +
-      '<style>' +
-      'body{font-family:Arial;padding:2rem;direction:rtl;text-align:center;background:#f7f7f7;}' +
-      'header,footer{background:#fff;padding:1rem;box-shadow:0 2px 5px rgba(0,0,0,0.1);margin-bottom:1rem;}' +
-      'header img,footer img{max-height:60px;}' +
-      '.container{max-width:600px;margin:2rem auto;background:#fff;padding:2rem;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.2);}' +
-      '.title{font-size:24px;font-weight:bold;color:#162148;margin-bottom:1.5rem;border-bottom:2px solid #1e40af;padding-bottom:0.5rem;}' +
-      '.status{background:#f0fdf4;color:#15803d;padding:1rem;border-radius:8px;font-size:18px;font-weight:bold;margin-bottom:1rem;}' +
-      '.grid{background:#f7f7f7;padding:1.5rem;border-radius:8px;text-align:right;}' +
-      '.grid p{margin:0.5rem 0;}' +
-      '.grid strong{color:#162148;}' +
-      '</style></head><body>' +
-      '<header><img src="HeaderLogo.jpg" alt="שערי צדק"></header>' +
-      '<div class="container">' +
-      '<div class="title">אישור תשלום - שערי צדק</div>' +
-      '<div class="status">✓ התשלום התקבל בהצלחה</div>' +
-      '<div class="grid">' +
-      '<p><strong>מספר עסקה (Tranzila):</strong> ' + (tranid || '—') + '</p>' +
-      '<p><strong>מס׳ אשפוז (Order ID):</strong> ' + (orderid || '—') + '</p>' +
-      '<p><strong>סכום ששולם:</strong> ' + (sum || '—') + ' ₪</p>' +
-      '<p><strong>תאריך ושעה:</strong> ' + new Date().toLocaleString('he-IL') + '</p>' +
-      '</div></div>' +
-      '<footer><img src="FooterLogo.png" alt="שערי צדק"></footer>' +
-      '</body></html>';
+      // הדפסה / שמירה כ-PDF
+      document.getElementById('btnPrint').addEventListener('click', function(){
+        window.print();
+      });
 
-    var blob = new Blob([html], {type: 'text/html;charset=utf-8'});
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'receipt_' + (tranid || orderid || 'payment') + '.html';
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 100);
-  });
-})();
+      // שמירת קבלה כ-HTML
+      document.getElementById('btnSave').addEventListener('click', function(){
+        var html = '<!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="utf-8"></head><body style="font-family:Arial;padding:2rem;direction:rtl;text-align:right;">' +
+          '<h2 style="color:#162148;">אישור תשלום - שערי צדק</h2>' +
+          '<div style="background:#f7f7f7;padding:1.5rem;border-radius:8px;margin:1rem 0;">' +
+          '<p><strong>מספר עסקה (Tranzila):</strong> ' + (tranid || '—') + '</p>' +
+          '<p><strong>מס׳ אשפוז (Order ID):</strong> ' + (orderid || '—') + '</p>' +
+          '<p><strong>סכום ששולם:</strong> ' + (sum || '—') + ' ₪</p>' +
+          '<p><strong>תאריך ושעה:</strong> ' + new Date().toLocaleString('he-IL') + '</p>' +
+          '</div></body></html>';
+
+        var blob = new Blob([html], {type: 'text/html;charset=utf-8'});
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'receipt_' + (tranid || orderid || 'payment') + '.html';
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 100);
+      });
+    })();
 </script>
 </body>
+
 </html>
+
+
+
