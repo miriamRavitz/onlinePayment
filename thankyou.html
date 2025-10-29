@@ -8,26 +8,53 @@
 <style>
     /* סגנונות למסך - נקי וללא עיצוב */
     @media screen {
-      body {
-        background: transparent !important;
-        padding: 0 !important;
-        margin: 0 !important;
+      * {
+        box-sizing: border-box;
       }
       
-      header, footer {
+      html, body {
+        background: white !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        height: auto !important;
+        overflow: visible !important;
+      }
+      
+      header {
         display: none !important;
+        visibility: hidden !important;
+        height: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        opacity: 0 !important;
+      }
+      
+      footer {
+        display: none !important;
+        visibility: hidden !important;
+        height: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        opacity: 0 !important;
       }
       
       .page-title {
         display: none !important;
+        visibility: hidden !important;
+        height: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        opacity: 0 !important;
       }
       
       .form-container {
         max-width: 100% !important;
+        width: 100% !important;
         margin: 0 !important;
-        padding: 1.5rem !important;
+        padding: 1rem !important;
         box-shadow: none !important;
-        background: transparent !important;
+        background: white !important;
+        border-radius: 0 !important;
       }
     }
 
