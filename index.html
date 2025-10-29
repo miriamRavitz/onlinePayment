@@ -14,7 +14,10 @@
     <img src="HeaderLogo.jpg" alt="שערי צדק" />
   </header>
 
-  <h1 class="page-title">דף תשלום על אשפוז מס' <span id="hospitalizationNumber"></span></h1>
+  <h1 class="page-title">שלום '  <span id="patientName"></span> תשלום חוב בסך 
+    <span id="amount"></span> ש"ח, עבור אשפוז מספר
+    <span id="hospitalizationNumber"></span>
+    מתאריך <span id="hospDate"></span> </h1>
 
   <div class="form-container" id="formContainer">
     <h2 class="form-title">פרטי משלם</h2>
@@ -62,7 +65,8 @@
     const params = new URLSearchParams(window.location.search);
     const hosp = params.get('hospitalization') || '';
     const amount = params.get('amount') || '';
-   
+    const patientName = params.get('patientName') || '';
+   const hospDate = params.get('hospDate') || '';
     // הצגת מספר האשפוז בכותרת
     document.getElementById('hospitalizationNumber').textContent = hosp;
 
