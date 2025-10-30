@@ -68,45 +68,38 @@
    //// const amount = params.get('amount') || '';
    // const patientName = params.get('patientName') || '';
    //const hospDate = params.get('hospDate') || '';
-(function () {
-  function getParams() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const fromUrl = {
-      hosp: urlParams.get('hospitalization') || '',
-      amount: urlParams.get('amount') || '',
-      patientName: urlParams.get('patientName') || '',
-      hospDate: urlParams.get('hospDate') || ''
-    };
+// בדיקת פרמטרים מה-URL
+let params = new URLSearchParams(window.location.search);
 
-    // אם יש פרמטרים ב־URL, שומרים אותם
-    if (fromUrl.hosp || fromUrl.amount || fromUrl.patientName) {
-      sessionStorage.setItem('paymentData', JSON.stringify(fromUrl));
+let hosp = params.get('hospitalization');
+let amount = params.get('amount');
+let patientName = params.get('patientName');
+let hospDate = params.get('hospDate');
 
-      // ננקה את ה-URL (רק אם היו בו פרמטרים)
-      if (history.replaceState) {
-        history.replaceState({}, document.title, window.location.pathname);
-      }
+// אם יש פרמטרים – נשמור אותם ב-localStorage
+if (hosp && amount && patientName && hospDate) {
+  localStorage.setItem('hospitalization', hosp);
+  localStorage.setItem('amount', amount);
+  localStorage.setItem('patientName', patientName);
+  localStorage.setItem('hospDate', hospDate);
 
-      return fromUrl;
-    }
-
-    // אם אין פרמטרים ב-URL, ננסה לשלוף מ-sessionStorage
-    const fromSession = sessionStorage.getItem('paymentData');
-    if (fromSession) {
-      return JSON.parse(fromSession);
-    }
-
-    // ברירת מחדל
-    return { hosp: '', amount: '', patientName: '', hospDate: '' };
+  // ננקה את ה-URL מהפרמטרים
+  if (history.replaceState) {
+    history.replaceState({}, document.title, window.location.pathname);
   }
+} else {
+  // אם אין פרמטרים – נטען מ-localStorage
+  hosp = localStorage.getItem('hospitalization') || '';
+  amount = localStorage.getItem('amount') || '';
+  patientName = localStorage.getItem('patientName') || '';
+  hospDate = localStorage.getItem('hospDate') || '';
+}
 
-  const { hosp, amount, patientName, hospDate } = getParams();
-
-  document.getElementById('hospitalizationNumber').textContent = hosp;
-  document.getElementById('hospDate').textContent = hospDate;
-  document.getElementById('amount').textContent = amount;
-  document.getElementById('patientName').textContent = patientName;
-})();
+// הצגת הנתונים בדף
+document.getElementById('hospitalizationNumber').textContent = hosp;
+document.getElementById('hospDate').textContent = hospDate;
+document.getElementById('amount').textContent = amount;
+document.getElementById('patientName').textContent = patientName;
 
       if (history.replaceState) {
           history.replaceState({}, document.title, window.location.pathname);
