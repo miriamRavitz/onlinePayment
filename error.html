@@ -4,43 +4,32 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>התשלום נכשל</title>
-  <link rel="stylesheet" href="styles.css" />
   <style>
-    /* סגנונות למסך */
-  
-
-    /* סגנונות להדפסה */
-    @media print {
-      body {
-        background: white !important;
-        padding: 2rem !important;
-      }
-      
-      header, footer {
-        display: block !important;
-      }
-      
-      header img, footer img {
-        max-height: 60px;
-      }
-      
-      .page-title {
-        display: block !important;
-        font-size: 22px;
-        padding: 1rem 0;
-        text-align: center;
-        border-bottom: 2px solid #162148;
-        margin-bottom: 1.5rem;
-      }
-      
-      .form-container {
-        max-width: 100% !important;
-        margin: 0 !important;
-        padding: 1.5rem !important;
-        box-shadow: none !important;
-      }
+    /* איפוס בסיסי */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
 
+    html, body {
+      background: white;
+      font-family: Arial, sans-serif;
+      direction: rtl;
+    }
+
+    /* הסתרת אלמנטים שלא נужאים */
+    header, footer, .page-title {
+      display: none !important;
+    }
+
+    /* מיכל ראשי */
+    .form-container {
+      padding: 1rem;
+      text-align: center;
+    }
+
+    /* סטטוס שגיאה */
     .status {
       display: flex;
       align-items: center;
@@ -48,22 +37,21 @@
       gap: 0.75rem;
       font-size: 20px;
       font-weight: bold;
-      color: #162148;
       margin-bottom: 1rem;
       padding: 1rem;
       border-radius: 8px;
-    }
-    .status.err {
       background-color: #fef2f2;
       color: #dc2626;
     }
+
     .status svg {
       flex-shrink: 0;
     }
+
+    /* טקסט משני */
     .sub {
       text-align: center;
       color: #666;
-      margin-bottom: 2rem;
       font-size: 14px;
       line-height: 1.6;
     }
@@ -95,26 +83,21 @@
 
   <script>
     (function(){
-      // יציאה מ-iframe - פתיחה בדף נפרד
-      if (window.top !== window.self) {
-        window.top.location.href = window.location.href;
-      }
+      // לוג לקונסול לדיבאג - ללא שבירת iframe
+      var qs = new URLSearchParams(window.location.search);
       
-      // פענוח כפול של ה-URL כי Tranzila מקודד פעמיים
-      var fullUrl = decodeURIComponent(window.location.search);
-      var qs = new URLSearchParams(fullUrl.startsWith('?') ? fullUrl.substring(1) : fullUrl);
-      
-      // ניסיון נוסף - אם זה לא עבד, נסה את הדרך הרגילה
+      // ניסיון לפענוח כפול
       if (!qs.get('Response')) {
-        qs = new URLSearchParams(window.location.search);
+        var fullUrl = decodeURIComponent(window.location.search);
+        qs = new URLSearchParams(fullUrl.startsWith('?') ? fullUrl.substring(1) : fullUrl);
       }
       
       var response = qs.get('Response') || qs.get('response') || '';
       var orderid = qs.get('hospitalization') || qs.get('orderid') || qs.get('order_id') || '';
       
-      console.log('Error page - Response code:', response);
+      console.log('Error page loaded');
+      console.log('Response code:', response);
       console.log('Order ID:', orderid);
-      console.log('Full URL:', window.location.href);
     })();
   </script>
 </body>
