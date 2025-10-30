@@ -203,6 +203,12 @@
  
 <script>
 (function(){
+  // נקה את כל המפתחות השייכים לתשלום
+['hospitalization', 'amount', 'patientName', 'hospDate'].forEach(key => {
+  localStorage.removeItem(key);
+});
+
+
   // פענוח כפול של ה-URL כי Tranzila מקודד פעמיים
   var fullUrl = decodeURIComponent(window.location.search);
   

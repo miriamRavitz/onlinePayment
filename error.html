@@ -82,7 +82,14 @@
   </footer>
 
   <script>
+    
     (function(){
+
+      // נקה את כל המפתחות השייכים לתשלום
+['hospitalization', 'amount', 'patientName', 'hospDate'].forEach(key => {
+  localStorage.removeItem(key);
+});
+
       // לוג לקונסול לדיבאג - ללא שבירת iframe
       var qs = new URLSearchParams(window.location.search);
       
