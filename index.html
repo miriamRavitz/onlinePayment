@@ -69,30 +69,26 @@
    // const patientName = params.get('patientName') || '';
    //const hospDate = params.get('hospDate') || '';
 function getParamsFromUrlOrSession() {
-  let params = new URLSearchParams(window.location.search);
-  let result = {
-    hosp: '',
-    amount: '',
-    patientName: '',
-    hospDate: ''
-  };
+  const params = new URLSearchParams(window.location.search);
 
-  if (params.toString()) {
-    result.hosp = params.get('hospitalization') || '';
-    result.amount = params.get('amount') || '';
-    result.patientName = params.get('patientName') || '';
-    result.hospDate = params.get('hospDate') || '';
+  // ננסה לשלוף מה-sessionStorage
+  const stored = sessionStorage.getItem('paymentData');
 
-    // שמירה ל-sessionStorage
-    sessionStorage.setItem('paymentData', JSON.stringify(result));
+  if (params.has('hospitalization') || params.has('amount')) {
+    const hosp = params.get('hospitalization') || '';
+    const amount = params.get('amount') || '';
+    const patientName = params.get('patientName') || '';
+    const hospDate = params.get('hospDate') || '';
+    
+    // נשמור בזיכרון לטעינה הבאה
+    sessionStorage.setItem('paymentData', JSON.stringify({ hosp, amount, patientName, hospDate }));
+
+    return { hosp, amount, patientName, hospDate };
+  } else if (stored) {
+    return JSON.parse(stored);
   } else {
-    const stored = sessionStorage.getItem('paymentData');
-    if (stored) {
-      result = JSON.parse(stored);
-    }
+    return { hosp: '', amount: '', patientName: '', hospDate: '' };
   }
-
-  return result;
 }
 
 const { hosp, amount, patientName, hospDate } = getParamsFromUrlOrSession();
