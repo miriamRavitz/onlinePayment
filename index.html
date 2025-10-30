@@ -63,11 +63,40 @@
   </footer>
 
   <script>
-    const params = new URLSearchParams(window.location.search);
-    const hosp = params.get('hospitalization') || '';
-    const amount = params.get('amount') || '';
-    const patientName = params.get('patientName') || '';
-   const hospDate = params.get('hospDate') || '';
+   // const params = new URLSearchParams(window.location.search);
+   //// const hosp = params.get('hospitalization') || '';
+   //// const amount = params.get('amount') || '';
+   // const patientName = params.get('patientName') || '';
+   //const hospDate = params.get('hospDate') || '';
+function getParamsFromUrlOrSession() {
+  let params = new URLSearchParams(window.location.search);
+  let result = {
+    hosp: '',
+    amount: '',
+    patientName: '',
+    hospDate: ''
+  };
+
+  if (params.toString()) {
+    result.hosp = params.get('hospitalization') || '';
+    result.amount = params.get('amount') || '';
+    result.patientName = params.get('patientName') || '';
+    result.hospDate = params.get('hospDate') || '';
+
+    // שמירה ל-sessionStorage
+    sessionStorage.setItem('paymentData', JSON.stringify(result));
+  } else {
+    const stored = sessionStorage.getItem('paymentData');
+    if (stored) {
+      result = JSON.parse(stored);
+    }
+  }
+
+  return result;
+}
+
+const { hosp, amount, patientName, hospDate } = getParamsFromUrlOrSession();
+
 
    console.log('hospitalization:', hosp);
    console.log('amount:', amount);
