@@ -121,7 +121,7 @@ input.error {
 }
  
 .iframe-container {
-    max-width: 350px;
+    max-width: 600px;
     margin: 2rem auto;
     background: #fff;
     padding: 1rem;
@@ -131,7 +131,7 @@ input.error {
  
 iframe {
     width: 100%;
-    height: 450px;
+    height: 500px;
     border: none;
     display: block;
 }
