@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>אישור תשלום</title>
-<link rel="stylesheet" href="styles.css" />
+<link rel="stylesheet" href="styles.css" media="print" />
 <style>
     /* סגנונות למסך - נקי וללא עיצוב */
     @media screen {
@@ -175,14 +175,14 @@
 </svg>
 התשלום התקבל בהצלחה
 </div>
-<p class="sub" >קבלה תשלח בדוא"ל בתוך כמה ימים.</p>
+<p class="sub">קבלה תשלח בדוא"ל בתוך כמה ימים.</p>
  
 <div class="grid">
-<div class="label">מספר שובר שב"א :</div>
+<div class="label">מספר שובר שב"א:</div>
 <div class="val" id="tranid">—</div>
 <div class="label">4 ספרות אחרונות:</div> 
 <div class="val" id="ccno">—</div>
-<div class="label">מס׳ אשפוז :</div>
+<div class="label">מס׳ אשפוז:</div>
 <div class="val" id="orderid">—</div>
 <div class="label">סכום ששולם:</div>
 <div class="val"><span id="sum">—</span> ₪</div>
@@ -219,13 +219,14 @@
   var orderid = qs.get('hospitalization') || qs.get('orderid') || qs.get('order_id') || '';
   var sum = qs.get('sum') || qs.get('amount') || '';
   var response = qs.get('Response') || qs.get('response') || '';
-  var ccno=qs.get('ccno') || ''; 
-  console.log('Parsed values:', {tranid, orderid, sum, response});
+  var ccno = qs.get('ccno') || ''; 
+  
+  console.log('Parsed values:', {tranid, orderid, sum, response, ccno});
 
   if(tranid) document.getElementById('tranid').textContent = tranid;
   if(orderid) document.getElementById('orderid').textContent = orderid;
   if(sum) document.getElementById('sum').textContent = sum;
-if(ccno) document.getElementById('ccno').textContent = ccno;
+  if(ccno) document.getElementById('ccno').textContent = ccno;
 
   document.getElementById('when').textContent = new Date().toLocaleString('he-IL');
 
@@ -234,41 +235,64 @@ if(ccno) document.getElementById('ccno').textContent = ccno;
     window.print();
   });
 
-  // שמירת קבלה כ-HTML
+  // שמירת קבלה כ-HTML עם תמונות Base64
   document.getElementById('btnSave').addEventListener('click', function(){
-    var html = '<!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="utf-8">' +
-      '<style>' +
-      'body{font-family:Arial;padding:2rem;direction:rtl;text-align:center;background:#f7f7f7;}' +
-      'header,footer{background:#fff;padding:1rem;box-shadow:0 2px 5px rgba(0,0,0,0.1);margin-bottom:1rem;}' +
-      'header img,footer img{max-height:80px;}' +
-      '.container{max-width:600px;margin:2rem auto;background:#fff;padding:2rem;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.2);}' +
-      '.title{font-size:24px;font-weight:bold;color:#162148;margin-bottom:1.5rem;border-bottom:2px solid #1e40af;padding-bottom:0.5rem;}' +
-      '.status{background:#f0fdf4;color:#15803d;padding:1rem;border-radius:8px;font-size:18px;font-weight:bold;margin-bottom:1rem;}' +
-      '.grid{background:#f7f7f7;padding:1.5rem;border-radius:8px;text-align:right;}' +
-      '.grid p{margin:0.5rem 0;}' +
-      '.grid strong{color:#162148;}' +
-      '</style></head><body>' +
-      '<header><img src="HeaderLogo.jpg" alt="שערי צדק"></header>' +
-      '<div class="container">' +
-      '<div class="title">אישור תשלום - שערי צדק</div>' +
-      '<div class="status">✓ התשלום התקבל בהצלחה</div>' +
-      '<div class="grid">' +
-      '<p><strong>מספר שובר שב"א:</strong> ' + ( tranid || '—') + '</p>' +
-       '<p><strong>4 ספרות אחרונות:</strong> ' + ( ccno || '—') + '</p>' +
-      '<p><strong>מס׳ אשפוז :</strong> ' + (orderid || '—') + '</p>' +
-      '<p><strong>סכום ששולם:</strong> ' + (sum || '—') + ' ₪</p>' +
-      '<p><strong>תאריך ושעה:</strong> ' + new Date().toLocaleString('he-IL') + '</p>' +
-      '</div></div>' +
-      '<footer><img src="FooterLogo.png" alt="שערי צדק"></footer>' +
-      '</body></html>';
+    // קריאת התמונות כ-Base64
+    Promise.all([
+      fetch('HeaderLogo.jpg').then(r => r.blob()).then(blob => {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+      }).catch(() => ''), // אם נכשל, החזר מחרוזת רקה
+      fetch('FooterLogo.png').then(r => r.blob()).then(blob => {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+      }).catch(() => '') // אם נכשל, החזר מחרוזת רקה
+    ]).then(([headerImg, footerImg]) => {
+      var html = '<!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="utf-8">' +
+        '<style>' +
+        'body{font-family:Arial;padding:2rem;direction:rtl;text-align:center;background:#f7f7f7;}' +
+        'header,footer{background:#fff;padding:1rem;box-shadow:0 2px 5px rgba(0,0,0,0.1);margin-bottom:1rem;}' +
+        'header img,footer img{max-height:80px;}' +
+        '.container{max-width:600px;margin:2rem auto;background:#fff;padding:2rem;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.2);}' +
+        '.title{font-size:24px;font-weight:bold;color:#162148;margin-bottom:1.5rem;border-bottom:2px solid #1e40af;padding-bottom:0.5rem;}' +
+        '.status{background:#f0fdf4;color:#15803d;padding:1rem;border-radius:8px;font-size:18px;font-weight:bold;margin-bottom:1rem;}' +
+        '.grid{background:#f7f7f7;padding:1.5rem;border-radius:8px;text-align:right;}' +
+        '.grid p{margin:0.5rem 0;font-size:16px;}' +
+        '.grid strong{color:#162148;font-weight:bold;}' +
+        '</style></head><body>' +
+        '<header>' + (headerImg ? '<img src="' + headerImg + '" alt="שערי צדק">' : '') + '</header>' +
+        '<div class="container">' +
+        '<div class="title">אישור תשלום - שערי צדק</div>' +
+        '<div class="status">✓ התשלום התקבל בהצלחה</div>' +
+        '<div class="grid">' +
+        '<p><strong>מספר שובר שב"א:</strong> ' + (tranid || '—') + '</p>' +
+        '<p><strong>4 ספרות אחרונות:</strong> ' + (ccno || '—') + '</p>' +
+        '<p><strong>מס׳ אשפוז:</strong> ' + (orderid || '—') + '</p>' +
+        '<p><strong>סכום ששולם:</strong> ' + (sum || '—') + ' ₪</p>' +
+        '<p><strong>תאריך ושעה:</strong> ' + new Date().toLocaleString('he-IL') + '</p>' +
+        '</div></div>' +
+        '<footer>' + (footerImg ? '<img src="' + footerImg + '" alt="שערי צדק">' : '') + '</footer>' +
+        '</body></html>';
 
-    var blob = new Blob([html], {type: 'text/html;charset=utf-8'});
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'receipt_' + (tranid || orderid || 'payment') + '.html';
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 100);
+      var blob = new Blob([html], {type: 'text/html;charset=utf-8'});
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'receipt_' + (tranid || orderid || 'payment') + '.html';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 100);
+    }).catch(function(error) {
+      console.error('Error loading images:', error);
+      alert('שגיאה בשמירת הקבלה. נסו שוב.');
+    });
   });
 })();
 </script>
