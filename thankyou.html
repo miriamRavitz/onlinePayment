@@ -1,306 +1,146 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
+    <link rel="stylesheet" href="styles.css" />
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>אישור תשלום</title>
-<link rel="stylesheet" href="styles.css"  />
-<style>
-    /* סגנונות למסך - נקי וללא עיצוב */
-    @media screen {
-      * {
-        box-sizing: border-box;
-      }
-      
-      html, body {
-        background: white !important;
-        padding: 0 !important;
-        margin: 0 !important;
-        height: auto !important;
-        overflow: visible !important;
-      }
-      
-      header {
-        display: none !important;
-        visibility: hidden !important;
-        height: 0 !important;
-        padding: 0 !important;
-        margin: 0 !important;
-        opacity: 0 !important;
-      }
-      
-      footer {
-        display: none !important;
-        visibility: hidden !important;
-        height: 0 !important;
-        padding: 0 !important;
-        margin: 0 !important;
-        opacity: 0 !important;
-      }
-      
-      .page-title {
-        display: none !important;
-        visibility: hidden !important;
-        height: 0 !important;
-        padding: 0 !important;
-        margin: 0 !important;
-        opacity: 0 !important;
-      }
-      
-      .form-container {
-        max-width: 100% !important;
-        width: 100% !important;
-        margin: 0 !important;
-        padding: 1rem !important;
-        box-shadow: none !important;
-        background: white !important;
-        border-radius: 0 !important;
-      }
-    }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>תשלום – שערי צדק</title>
+  <link rel="stylesheet" href="styles.css" />
 
-    /* סגנונות להדפסה - עם כל העיצוב */
-    @media print {
-      body {
-        background: white !important;
-        padding: 2rem !important;
-      }
-      
-      header, footer {
-        display: block !important;
-        background: #ffffff;
-        padding: 1rem;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        margin-bottom: 1rem;
-      }
-      
-      header img, footer img {
-        max-height: 80px;
-      }
-      
-      .page-title {
-        display: block !important;
-        background: #ffffff;
-        padding: 2rem 1rem;
-        margin: 0 0 2rem 0;
-        font-size: 24px;
-        font-weight: bold;
-        color: #162148;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      }
-      
-      .form-container {
-        max-width: 600px !important;
-        margin: 2rem auto !important;
-        background: #fff !important;
-        padding: 2rem !important;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
-      }
-      
-      .stack {
-        display: none !important;
-      }
-    }
-
-    .status {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.75rem;
-      font-size: 20px;
-      font-weight: bold;
-      color: #162148;
-      margin-bottom: 1rem;
-      padding: 1rem;
-      border-radius: 8px;
-    }
-    .status.success {
-      background-color: #f0fdf4;
-      color: #15803d;
-    }
-    .status svg {
-      flex-shrink: 0;
-    }
-    .sub {
-      text-align: center;
-      color: #666;
-      margin-bottom: 2rem;
-      font-size: 14px;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: auto 1fr;
-      gap: 0.75rem 1.5rem;
-      margin-bottom: 2rem;
-      text-align: right;
-      background: #f7f7f7;
-      padding: 1.5rem;
-      border-radius: 6px;
-    }
-    .grid .label {
-      font-weight: 600;
-      color: #162148;
-      font-size: 16px;
-      font-weight: bold;
-    }
-    .grid .val {
-      color: #333;
-      font-size: 16px;
-      font-weight: bold;
-    }
-    .stack {
-      display: flex;
-      flex-direction: row;
-      gap: 1rem;
-      justify-content: center;
-    }
-    .stack .light-btn {
-      flex: 1;
-    }
-</style>
 </head>
 <body>
-<header>
-<img src="HeaderLogo.jpg" alt="שערי צדק" />
-</header>
  
-<h1 class="page-title">סיכום תשלום</h1>
+  <header>
+    <img src="HeaderLogo.jpg" alt="שערי צדק" />
+  </header>
+
+  <h1 class="page-title">שלום  <span id="patientName"></span> 
+<br
+>תשלום חוב בסך 
+    <span id="amount"></span> ש"ח, עבור אשפוז מספר
+    <span id="hospitalizationNumber"></span>
+    מתאריך <span id="hospDate"></span> </h1>
+<div class="form-container" id="formContainer">
+    <h2 class="form-title">פרטי משלם</h2>
+    <form id="preForm">
+      <div class="form-group">
+        <label>שם פרטי *</label>
+        <input type="text" id="fname" name="fname" required />
+      </div>
+     
+      <div class="form-group">
+        <label>שם משפחה *</label>
+        <input type="text" id="lname" name="lname" required />
+      </div>
+     
+      <div class="form-group">
+        <label>כתובת *</label>
+        <input type="text" id="address" name="address" required />
+      </div>
+     
+      <div class="form-group">
+        <label>טלפון *</label>
+        <input type="tel" id="phone" name="phone" required />
+        <div class="error-message" id="phoneError"></div>
+      </div>
+     
+      <div class="form-group">
+        <label>אימייל *</label>
+        <input type="email" id="email" name="email" required />
+      </div>
+     
+      <button type="submit" class="light-btn">המשך לתשלום</button>
+    </form>
+  </div>
+
+  <div class="iframe-container" id="iframeContainer" style="display:none;">
+    <iframe id="tranzilaFrame" title="טופס תשלום"></iframe>
+    <a class="iframe-back-link" onclick="goBackToForm()">← חזרה לעדכון פרטים</a>
+  </div>
  
-<main class="form-container">
-<section>
-<div class="status success">
-<svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-<circle cx="12" cy="12" r="11" stroke="currentColor" stroke-width="2"/>
-<path d="M7 12.5l3.5 3L17 8.5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>
-התשלום התקבל בהצלחה
-</div>
-<p class="sub">קבלה תשלח בדוא"ל בתוך כמה ימים.</p>
- 
-<div class="grid">
-<div class="label">מספר שובר שב"א:</div>
-<div class="val" id="tranid">—</div>
-<div class="label">4 ספרות אחרונות:</div> 
-<div class="val" id="ccno">—</div>
-<div class="label">מס׳ אשפוז:</div>
-<div class="val" id="orderid">—</div>
-<div class="label">סכום ששולם:</div>
-<div class="val"><span id="sum">—</span> ₪</div>
-<div class="label">תאריך ושעה:</div>
-<div class="val" id="when">—</div>
-</div>
- 
-<div class="stack">
-<button class="light-btn" id="btnPrint">הדפס / שמור PDF</button>
-<button class="light-btn" id="btnSave">שמור אישור תשלום (HTML)</button>
-</div>
-</section>
-</main>
- 
-<footer>
-<img src="FooterLogo.png" alt="שערי צדק" />
-</footer>
- 
-<script>
-(function(){
-  // נקה את כל המפתחות השייכים לתשלום
-['hospitalization', 'amount', 'patientName', 'hospDate'].forEach(key => {
-  localStorage.removeItem(key);
-});
+  <footer>
+    <img src="FooterLogo.png" alt="שערי צדק" />
+  </footer>
 
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const hosp = params.get('hospitalization') || '';
+    const amount = params.get('amount') || '';
+    const patientName = params.get('patientName') || '';
+   const hospDate = params.get('hospDate') || '';
 
-  // פענוח כפול של ה-URL כי Tranzila מקודד פעמיים
-  var fullUrl = decodeURIComponent(window.location.search);
-  
-  // יצירת query string מהנתונים המפוענחים
-  var qs = new URLSearchParams(fullUrl.startsWith('?') ? fullUrl.substring(1) : fullUrl);
-  
-  // ניסיון נוסף - אם זה לא עבד, נסה את הדרך הרגילה
-  if (!qs.get('Response')) {
-    qs = new URLSearchParams(window.location.search);
-  }
-  
-  console.log(qs.toString());
-  var tranid = qs.get('Tempref') || qs.get('tranid') || qs.get('TranzilaTK') || '';
-  var orderid = qs.get('hospitalization') || qs.get('orderid') || qs.get('order_id') || '';
-  var sum = qs.get('sum') || qs.get('amount') || '';
-  var response = qs.get('Response') || qs.get('response') || '';
-  var ccno = qs.get('ccno') || ''; 
-  
-  console.log('Parsed values:', {tranid, orderid, sum, response, ccno});
+   console.log('hospitalization:', hosp);
+   console.log('amount:', amount);
+    console.log('patientName:', patientName);
+    console.log('hospDate:', hospDate);
+    // הצגת מספר האשפוז בכותרת
+    document.getElementById('hospitalizationNumber').textContent = hosp;
+     document.getElementById('hospDate').textContent = hospDate;
+      document.getElementById('amount').textContent = amount;
+       document.getElementById('patientName').textContent = patientName;
 
-  if(tranid) document.getElementById('tranid').textContent = tranid;
-  if(orderid) document.getElementById('orderid').textContent = orderid;
-  if(sum) document.getElementById('sum').textContent = sum;
-  if(ccno) document.getElementById('ccno').textContent = ccno;
+      if (history.replaceState) {
+          history.replaceState({}, document.title, window.location.pathname);
+      }
 
-  document.getElementById('when').textContent = new Date().toLocaleString('he-IL');
-
-  // הדפסה / שמירה כ-PDF
-  document.getElementById('btnPrint').addEventListener('click', function(){
-    window.print();
-  });
-
-  // שמירת קבלה כ-HTML עם תמונות Base64
-  document.getElementById('btnSave').addEventListener('click', function(){
-    // קריאת התמונות כ-Base64
-    Promise.all([
-      fetch('HeaderLogo.jpg').then(r => r.blob()).then(blob => {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onloadend = () => resolve(reader.result);
-          reader.onerror = reject;
-          reader.readAsDataURL(blob);
-        });
-      }).catch(() => ''), // אם נכשל, החזר מחרוזת רקה
-      fetch('FooterLogo.png').then(r => r.blob()).then(blob => {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onloadend = () => resolve(reader.result);
-          reader.onerror = reject;
-          reader.readAsDataURL(blob);
-        });
-      }).catch(() => '') // אם נכשל, החזר מחרוזת רקה
-    ]).then(([headerImg, footerImg]) => {
-      var html = '<!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="utf-8">' +
-        '<style>' +
-        'body{font-family:Arial;padding:2rem;direction:rtl;text-align:center;background:#f7f7f7;}' +
-        'header,footer{background:#fff;padding:1rem;box-shadow:0 2px 5px rgba(0,0,0,0.1);margin-bottom:1rem;}' +
-        'header img,footer img{max-height:80px;}' +
-        '.container{max-width:600px;margin:2rem auto;background:#fff;padding:2rem;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.2);}' +
-        '.title{font-size:24px;font-weight:bold;color:#162148;margin-bottom:1.5rem;border-bottom:2px solid #1e40af;padding-bottom:0.5rem;}' +
-        '.status{background:#f0fdf4;color:#15803d;padding:1rem;border-radius:8px;font-size:18px;font-weight:bold;margin-bottom:1rem;}' +
-        '.grid{background:#f7f7f7;padding:1.5rem;border-radius:8px;text-align:right;}' +
-        '.grid p{margin:0.5rem 0;font-size:16px;}' +
-        '.grid strong{color:#162148;font-weight:bold;}' +
-        '</style></head><body>' +
-        '<header>' + (headerImg ? '<img src="' + headerImg + '" alt="שערי צדק">' : '') + '</header>' +
-        '<div class="container">' +
-        '<div class="title">אישור תשלום - שערי צדק</div>' +
-        '<div class="status">✓ התשלום התקבל בהצלחה</div>' +
-        '<div class="grid">' +
-        '<p><strong>מספר שובר שב"א:</strong> ' + (tranid || '—') + '</p>' +
-        '<p><strong>4 ספרות אחרונות:</strong> ' + (ccno || '—') + '</p>' +
-        '<p><strong>מס׳ אשפוז:</strong> ' + (orderid || '—') + '</p>' +
-        '<p><strong>סכום ששולם:</strong> ' + (sum || '—') + ' ₪</p>' +
-        '<p><strong>תאריך ושעה:</strong> ' + new Date().toLocaleString('he-IL') + '</p>' +
-        '</div></div>' +
-        '<footer>' + (footerImg ? '<img src="' + footerImg + '" alt="שערי צדק">' : '') + '</footer>' +
-        '</body></html>';
-
-      var blob = new Blob([html], {type: 'text/html;charset=utf-8'});
-      var a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'receipt_' + (tranid || orderid || 'payment') + '.html';
-      document.body.appendChild(a);
-      a.click();
-      setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 100);
-    }).catch(function(error) {
-      console.error('Error loading images:', error);
-      alert('שגיאה בשמירת הקבלה. נסו שוב.');
+   
+    const baseUrl = 'https://direct.tranzila.com/szmctest/iframe.php?lang=il&cred type=1&currency=1';
+   
+    // וולידציה על טלפון - מספרים בלבד
+    document.getElementById('phone').addEventListener('input', function(e) {
+      const phoneError = document.getElementById('phoneError');
+      const value = e.target.value;
+     
+      // הסרת כל תו שאינו מספר
+      const onlyNumbers = value.replace(/[^0-9]/g, '');
+     
+      if (value !== onlyNumbers) {
+        e.target.value = onlyNumbers;
+      }
+     
+      if (onlyNumbers.length > 0) {
+        e.target.classList.remove('error');
+        phoneError.textContent = '';
+      }
     });
-  });
-})();
-</script>
+   
+    document.getElementById('preForm').addEventListener('submit', function(e){
+      e.preventDefault();
+     
+      const fname = document.getElementById('fname').value.trim();
+      const lname = document.getElementById('lname').value.trim();
+      const address = document.getElementById('address').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const phoneError = document.getElementById('phoneError');
+     
+      // בדיקת שדות חובה
+      if(!fname || !lname || !address || !phone || !email) {
+        alert('נא למלא את כל השדות החובה');
+        return;
+      }
+      
+      // בדיקת טלפון - מספרים בלבד
+      if (!/^[0-9]+$/.test(phone)) {
+        document.getElementById('phone').classList.add('error');
+        phoneError.textContent = 'טלפון חייב להכיל מספרים בלבד';
+        alert('נא להכניס מספר טלפון תקין (מספרים בלבד)');
+        return;
+      }
+     
+      const iframeUrl = `${baseUrl}&sum=${encodeURIComponent(amount)}&hospitalization=${encodeURIComponent(hosp)}&fname=${encodeURIComponent(fname)}&lname=${encodeURIComponent(lname)}&address=${encodeURIComponent(address)}&phone=${encodeURIComponent(phone)}&email=${encodeURIComponent(email)}`;
+     
+      document.getElementById('tranzilaFrame').src = iframeUrl;
+      document.getElementById('iframeContainer').style.display = 'block';
+      document.getElementById('formContainer').style.display = 'none';
+    });
+   
+    // פונקציה לחזרה לטופס
+    function goBackToForm() {
+      document.getElementById('iframeContainer').style.display = 'none';
+      document.getElementById('formContainer').style.display = 'block';
+      document.getElementById('tranzilaFrame').src = '';
+    }
+  </script>
 </body>
 </html>
