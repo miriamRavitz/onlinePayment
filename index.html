@@ -1,12 +1,10 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
-    <link rel="stylesheet" href="styles.css" />
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>תשלום – שערי צדק</title>
   <link rel="stylesheet" href="styles.css" />
-
 </head>
 <body>
  
@@ -14,13 +12,14 @@
     <img src="HeaderLogo.jpg" alt="שערי צדק" />
   </header>
 
-  <h1 class="page-title">שלום  <span id="patientName"></span> 
-<br
->תשלום חוב בסך 
+  <h1 class="page-title">שלום <span id="patientName"></span> 
+    <br>תשלום חוב בסך 
     <span id="amount"></span> ש"ח, עבור אשפוז מספר
     <span id="hospitalizationNumber"></span>
-    מתאריך <span id="hospDate"></span> </h1>
-<div class="form-container" id="formContainer">
+    מתאריך <span id="hospDate"></span>
+  </h1>
+
+  <div class="form-container" id="formContainer">
     <h2 class="form-title">פרטי משלם</h2>
     <form id="preForm">
       <div class="form-group">
@@ -61,53 +60,35 @@
   <footer>
     <img src="FooterLogo.png" alt="שערי צדק" />
   </footer>
-
+ 
   <script>
-   // const params = new URLSearchParams(window.location.search);
-   //// const hosp = params.get('hospitalization') || '';
-   //// const amount = params.get('amount') || '';
-   // const patientName = params.get('patientName') || '';
-   //const hospDate = params.get('hospDate') || '';
-// בדיקת פרמטרים מה-URL
-let params = new URLSearchParams(window.location.search);
-
-let hosp = params.get('hospitalization');
-let amount = params.get('amount');
-let patientName = params.get('patientName');
-let hospDate = params.get('hospDate');
-
-// אם יש פרמטרים – נשמור אותם ב-localStorage
-if (hosp && amount && patientName && hospDate) {
-  localStorage.setItem('hospitalization', hosp);
-  localStorage.setItem('amount', amount);
-  localStorage.setItem('patientName', patientName);
-  localStorage.setItem('hospDate', hospDate);
-
-  // ננקה את ה-URL מהפרמטרים
-  if (history.replaceState) {
-    history.replaceState({}, document.title, window.location.pathname);
-  }
-} else {
-  // אם אין פרמטרים – נטען מ-localStorage
-  hosp = localStorage.getItem('hospitalization') || '';
-  amount = localStorage.getItem('amount') || '';
-  patientName = localStorage.getItem('patientName') || '';
-  hospDate = localStorage.getItem('hospDate') || '';
-}
-
-// הצגת הנתונים בדף
-document.getElementById('hospitalizationNumber').textContent = hosp;
-document.getElementById('hospDate').textContent = hospDate;
-document.getElementById('amount').textContent = amount;
-document.getElementById('patientName').textContent = patientName;
-
-      if (history.replaceState) {
-          history.replaceState({}, document.title, window.location.pathname);
-      }
-
+    // קריאת פרמטרים מה-URL
+    const params = new URLSearchParams(window.location.search);
+    const hosp = params.get('hospitalization') || '';
+    const amount = params.get('amount') || '';
+    const patientName = params.get('patientName') || '';
+    const hospDate = params.get('hospDate') || '';
    
+    // הצגת מספר האשפוז בכותרת
+    document.getElementById('hospitalizationNumber').textContent = hosp;
+    document.getElementById('hospDate').textContent = hospDate;
+    document.getElementById('amount').textContent = amount;
+    document.getElementById('patientName').textContent = patientName;
+
+    // ניקוי ה-URL אבל שמירת הפרמטרים בזיכרון
+    if (history.replaceState) {
+      history.replaceState({}, document.title, window.location.pathname);
+    }
+
     const baseUrl = 'https://direct.tranzila.com/szmctest/iframe.php?lang=il&cred type=1&currency=1';
    
+    // אזהרה לפני יציאה/רענון - תמיד!
+    window.addEventListener('beforeunload', function(e) {
+      e.preventDefault();
+      e.returnValue = 'האם אתה בטוח שברצונך לעזוב? הקישור יפוג ותצטרך להיכנס מחדש.';
+      return e.returnValue;
+    });
+
     // וולידציה על טלפון - מספרים בלבד
     document.getElementById('phone').addEventListener('input', function(e) {
       const phoneError = document.getElementById('phoneError');
@@ -141,7 +122,7 @@ document.getElementById('patientName').textContent = patientName;
         alert('נא למלא את כל השדות החובה');
         return;
       }
-      
+     
       // בדיקת טלפון - מספרים בלבד
       if (!/^[0-9]+$/.test(phone)) {
         document.getElementById('phone').classList.add('error');
@@ -149,6 +130,9 @@ document.getElementById('patientName').textContent = patientName;
         alert('נא להכניס מספר טלפון תקין (מספרים בלבד)');
         return;
       }
+
+      // סימון שהתשלום בתהליך
+      paymentInProgress = true;
      
       const iframeUrl = `${baseUrl}&sum=${encodeURIComponent(amount)}&hospitalization=${encodeURIComponent(hosp)}&fname=${encodeURIComponent(fname)}&lname=${encodeURIComponent(lname)}&address=${encodeURIComponent(address)}&phone=${encodeURIComponent(phone)}&email=${encodeURIComponent(email)}`;
      
@@ -162,6 +146,7 @@ document.getElementById('patientName').textContent = patientName;
       document.getElementById('iframeContainer').style.display = 'none';
       document.getElementById('formContainer').style.display = 'block';
       document.getElementById('tranzilaFrame').src = '';
+      paymentInProgress = false;
     }
   </script>
 </body>
