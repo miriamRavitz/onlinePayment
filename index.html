@@ -90,69 +90,80 @@
       return e.returnValue;
     });
 
-    // וולידציה על טלפון - מספרים בלבד
-    document.getElementById('phone').addEventListener('input', function(e) {
-      const phoneError = document.getElementById('phoneError');
-      const value = e.target.value;
-     
-      // הסרת כל תו שאינו מספר
-      const onlyNumbers = value.replace(/[^0-9]/g, '');
-     
-      if (value !== onlyNumbers) {
-        e.target.value = onlyNumbers;
-      }
-     
-      if (onlyNumbers.length > 0) {
-        e.target.classList.remove('error');
-        phoneError.textContent = '';
-      }
-    });
+  document.addEventListener('DOMContentLoaded', () => {
+  const requiredFields = [
+    { id: 'fname', message: 'נא למלא את השם הפרטי' },
+    { id: 'lname', message: 'נא למלא את שם המשפחה' },
+    { id: 'address', message: 'נא למלא את הכתובת' },
+    { id: 'phone', message: 'נא למלא מספר טלפון תקין' },
+    { id: 'email', message: 'נא למלא כתובת אימייל תקינה' }
+  ];
 
-        const requiredFields = [
-  { id: 'fname', message: 'נא למלא את השם הפרטי' },
-  { id: 'lname', message: 'נא למלא את שם המשפחה' },
-  { id: 'address', message: 'נא למלא את הכתובת' },
-  { id: 'phone', message: 'נא למלא מספר טלפון תקין' },
-  { id: 'email', message: 'נא למלא כתובת אימייל' }
-];
+  // הודעות מותאמות אישית לשדות חובה
+  requiredFields.forEach(field => {
+    const input = document.getElementById(field.id);
+    if (!input) return;
 
-requiredFields.forEach(field => {
-  const input = document.getElementById(field.id);
-  if (!input) return;
+    input.oninvalid = function () {
+      this.setCustomValidity(field.message);
+    };
 
-  input.oninvalid = function () {
-    this.setCustomValidity(field.message);
-  };
+    input.oninput = function () {
+      this.setCustomValidity('');
+    };
+  });
 
-  input.oninput = function () {
-    this.setCustomValidity('');
-  };
+  // וולידציה על טלפון - רק מספרים
+  const phoneInput = document.getElementById('phone');
+  phoneInput.addEventListener('input', function (e) {
+    const phoneError = document.getElementById('phoneError');
+    const onlyNumbers = e.target.value.replace(/[^0-9]/g, '');
+    e.target.value = onlyNumbers;
+    phoneInput.classList.remove('error');
+    phoneError.textContent = '';
+  });
+
+  // שליחת טופס
+  document.getElementById('preForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const fname = document.getElementById('fname').value.trim();
+    const lname = document.getElementById('lname').value.trim();
+    const address = document.getElementById('address').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const phoneError = document.getElementById('phoneError');
+
+    // בדיקת שדות חובה
+    if (!fname || !lname || !address || !phone || !email) {
+      alert('נא למלא את כל השדות החובה');
+      return;
+    }
+
+    // בדיקת טלפון - 10 ספרות ומתחיל ב־0
+    if (!/^0\d{9}$/.test(phone)) {
+      phoneInput.classList.add('error');
+      phoneError.textContent = 'מספר טלפון חייב להכיל 10 ספרות ולהתחיל ב־0';
+      alert('נא להכניס מספר טלפון תקין');
+      return;
+    }
+
+    // בדיקת מייל לפי תבנית תקינה
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+    if (!emailPattern.test(email)) {
+      alert('כתובת האימייל אינה תקינה');
+      return;
+    }
+
+    // סימון שהתשלום בתהליך
+    paymentInProgress = true;
+
+    // המשך תהליך תשלום או שליחה
+    // לדוגמה:
+    // this.submit();
+    console.log('טופס תקין – ממשיכים לתשלום...');
+  });
 });
-    
-    document.getElementById('preForm').addEventListener('submit', function(e){
-      e.preventDefault();
-     
-      const fname = document.getElementById('fname').value.trim();
-      const lname = document.getElementById('lname').value.trim();
-      const address = document.getElementById('address').value.trim();
-      const phone = document.getElementById('phone').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const phoneError = document.getElementById('phoneError');
-     
-      // בדיקת שדות חובה
-      if(!fname || !lname || !address || !phone || !email) {
-        alert('נא למלא את כל השדות החובה');
-        return;
-      }
-     
-      // בדיקת טלפון - מספרים בלבד
-      if (!/^[0-9]+$/.test(phone)) {
-        document.getElementById('phone').classList.add('error');
-        phoneError.textContent = 'טלפון חייב להכיל מספרים בלבד';
-        alert('נא להכניס מספר טלפון תקין (מספרים בלבד)');
-        return;
-      }
-
       // סימון שהתשלום בתהליך
       paymentInProgress = true;
      
