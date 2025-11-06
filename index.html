@@ -148,6 +148,27 @@
       document.getElementById('tranzilaFrame').src = '';
       paymentInProgress = false;
     }
+
+    const requiredFields = [
+  { id: 'fname', message: 'נא למלא את השם הפרטי' },
+  { id: 'lname', message: 'נא למלא את שם המשפחה' },
+  { id: 'address', message: 'נא למלא את הכתובת' },
+  { id: 'phone', message: 'נא למלא מספר טלפון תקין' },
+  { id: 'email', message: 'נא למלא כתובת אימייל' }
+];
+
+requiredFields.forEach(field => {
+  const input = document.getElementById(field.id);
+  if (!input) return;
+
+  input.oninvalid = function () {
+    this.setCustomValidity(field.message);
+  };
+
+  input.oninput = function () {
+    this.setCustomValidity('');
+  };
+});
   </script>
 </body>
 </html>
