@@ -5,37 +5,64 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>תשלום – שערי צדק</title>
   <link rel="stylesheet" href="styles.css" />
+  <script defer src="scripts.js"></script>
 </head>
 <body>
-  <h1>טופס תשלום</h1>
-  <form id="preForm">
-    <div class="form-group">
-      <label>שם פרטי *</label>
-      <input type="text" id="fname" />
-      <div class="error-message" id="fnameError"></div>
-    </div>
-    <div class="form-group">
-      <label>שם משפחה *</label>
-      <input type="text" id="lname" />
-      <div class="error-message" id="lnameError"></div>
-    </div>
-    <div class="form-group">
-      <label>כתובת *</label>
-      <input type="text" id="address" />
-      <div class="error-message" id="addressError"></div>
-    </div>
-    <div class="form-group">
-      <label>טלפון *</label>
-      <input type="text" id="phone" />
-      <div class="error-message" id="phoneError"></div>
-    </div>
-    <div class="form-group">
-      <label>אימייל *</label>
-      <input type="text" id="email" />
-      <div class="error-message" id="emailError"></div>
-    </div>
-    <button type="submit">המשך</button>
-  </form>
-  <script src="script.js"></script>
+  <header>
+    <img src="HeaderLogo.jpg" alt="שערי צדק" />
+  </header>
+
+  <h1 class="page-title">
+    שלום <span id="patientName"></span><br>
+    תשלום חוב בסך <span id="amount"></span> ש"ח, עבור אשפוז מספר
+    <span id="hospitalizationNumber"></span>
+    מתאריך <span id="hospDate"></span>
+  </h1>
+
+  <div class="form-container" id="formContainer">
+    <h2 class="form-title">פרטי משלם</h2>
+    <form id="preForm">
+      <div class="form-group">
+        <label>שם פרטי *</label>
+        <input type="text" id="fname" name="fname" required />
+        <div class="error-message" id="fnameError"></div>
+      </div>
+
+      <div class="form-group">
+        <label>שם משפחה *</label>
+        <input type="text" id="lname" name="lname" required />
+        <div class="error-message" id="lnameError"></div>
+      </div>
+
+      <div class="form-group">
+        <label>כתובת *</label>
+        <input type="text" id="address" name="address" required />
+        <div class="error-message" id="addressError"></div>
+      </div>
+
+      <div class="form-group">
+        <label>טלפון *</label>
+        <input type="tel" id="phone" name="phone" required />
+        <div class="error-message" id="phoneError"></div>
+      </div>
+
+      <div class="form-group">
+        <label>אימייל *</label>
+        <input type="email" id="email" name="email" required />
+        <div class="error-message" id="emailError"></div>
+      </div>
+
+      <button type="submit" class="light-btn">המשך לתשלום</button>
+    </form>
+  </div>
+
+  <div class="iframe-container" id="iframeContainer" style="display:none;">
+    <iframe id="tranzilaFrame" title="טופס תשלום"></iframe>
+    <a class="iframe-back-link" onclick="goBackToForm()">← חזרה לעדכון פרטים</a>
+  </div>
+
+  <footer>
+    <img src="FooterLogo.png" alt="שערי צדק" />
+  </footer>
 </body>
 </html>
