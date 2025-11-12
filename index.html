@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
   <meta charset="UTF-8" />
@@ -11,41 +11,47 @@
     <img src="HeaderLogo.jpg" alt="שערי צדק" />
   </header>
 
-  <h1 class="page-title">שלום <span id="patientName"></span><br>
+  <h1 class="page-title">
+    שלום <span id="patientName"></span><br />
     תשלום חוב בסך <span id="amount"></span> ש"ח, עבור אשפוז מספר
-    <span id="hospitalizationNumber"></span> מתאריך <span id="hospDate"></span>
+    <span id="hospitalizationNumber"></span> מתאריך
+    <span id="hospDate"></span>
   </h1>
 
   <div class="form-container" id="formContainer">
     <h2 class="form-title">פרטי משלם</h2>
-    <form id="preForm">
+    <form id="preForm" novalidate>
       <div class="form-group">
         <label>שם פרטי *</label>
-        <input type="text" id="fname" name="fname" required />
+        <input type="text" id="fname" name="fname" />
       </div>
+
       <div class="form-group">
         <label>שם משפחה *</label>
-        <input type="text" id="lname" name="lname" required />
+        <input type="text" id="lname" name="lname" />
       </div>
+
       <div class="form-group">
         <label>כתובת *</label>
-        <input type="text" id="address" name="address" required />
+        <input type="text" id="address" name="address" />
       </div>
+
       <div class="form-group">
         <label>טלפון *</label>
-        <input type="tel" id="phone" name="phone" required />
+        <input type="tel" id="phone" name="phone" />
         <div class="error-message" id="phoneError"></div>
       </div>
+
       <div class="form-group">
         <label>אימייל *</label>
-        <input type="email" id="email" name="email" required />
-        <div class="error-message" id="emailError"></div>
+        <input type="email" id="email" name="email" />
       </div>
+
       <button type="submit" class="light-btn">המשך לתשלום</button>
     </form>
   </div>
 
-  <div class="iframe-container" id="iframeContainer" style="display:none;">
+  <div class="iframe-container" id="iframeContainer" style="display: none">
     <iframe id="tranzilaFrame" title="טופס תשלום"></iframe>
     <a class="iframe-back-link" onclick="goBackToForm()">← חזרה לעדכון פרטים</a>
   </div>
