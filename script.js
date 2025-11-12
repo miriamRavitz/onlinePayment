@@ -1,3 +1,4 @@
+document.addEventListener('DOMContentLoaded', function () {
 // קריאת פרמטרים מה-URL
 const params = new URLSearchParams(window.location.search);
 const hosp = params.get('hospitalization') || '';
@@ -111,3 +112,4 @@ function goBackToForm() {
   document.getElementById('formContainer').style.display = 'block';
   document.getElementById('tranzilaFrame').src = '';
 }
+  });
