@@ -140,13 +140,13 @@ document.getElementById('preForm').addEventListener('submit', function(e){
   const phoneError = document.getElementById('phoneError');
 
   if(!fname || !lname || !address || !phone || !email) {
-    alert('נא למלא את כל השדות החובה');
+    alert('נא למלא את כל שדות החובה');
     return;
   }
 
   // בדיקת טלפון - 10 ספרות, מתחיל ב־0
-  if (!/^0\d{9}$/.test(phone)) {
-    phoneError.textContent = 'מספר טלפון חייב להתחיל ב־0 ולהכיל 10 ספרות בדיוק';
+  if (!/^0\d{8,9}$/.test(phone)) {
+    phoneError.textContent = 'מספר טלפון חייב להתחיל ב־0 ולהכיל בין 9 עד 10 ספרות';
     document.getElementById('phone').classList.add('error');
     return;
   }
