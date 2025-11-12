@@ -117,14 +117,14 @@ document.getElementById('preForm').addEventListener('submit', function(e){
 
 // חזרה לטופס
 
+  });
 
-  window.goBackToForm = function () {
+function goBackToForm() {
   document.getElementById('iframeContainer').style.display = 'none';
   document.getElementById('formContainer').style.display = 'block';
   document.getElementById('tranzilaFrame').src = '';
   paymentInProgress = false;
-};
+}
 
-  });
 
 
