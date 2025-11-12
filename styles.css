@@ -267,3 +267,13 @@ footer img {
         width: 100%;
     }
 }
+
+.error-message {
+  color: red;
+  font-size: 0.9em;
+  margin-top: 4px;
+}
+input.error {
+  border: 1px solid red;
+}
+
