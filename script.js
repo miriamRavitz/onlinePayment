@@ -6,6 +6,15 @@ const amount = params.get('amount') || '';
 const patientName = params.get('patientName') || '';
 const hospDate = params.get('hospDate') || '';
 
+  if (!hosp || !amount || !patientName || !hospDate) {
+    document.body.innerHTML = `
+      <div style="text-align: center; padding: 40px; font-size: 1.4em; color: darkred;">
+        נראה שהלינק פגום,<br>יש להיכנס מחדש ללינק שקיבלת בהודעה מהמרכז הרפואי שערי צדק.
+      </div>
+    `;
+    return; // מפסיק את המשך ההרצה
+  }
+  
 // הצגת פרטים בכותרת
 document.getElementById('hospitalizationNumber').textContent = hosp;
 document.getElementById('hospDate').textContent = hospDate;
