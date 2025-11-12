@@ -116,9 +116,15 @@ document.getElementById('preForm').addEventListener('submit', function(e){
 });
 
 // חזרה לטופס
-function goBackToForm() {
+
+
+  window.goBackToForm = function () {
   document.getElementById('iframeContainer').style.display = 'none';
   document.getElementById('formContainer').style.display = 'block';
   document.getElementById('tranzilaFrame').src = '';
-}
+  paymentInProgress = false;
+};
+
   });
+
+
