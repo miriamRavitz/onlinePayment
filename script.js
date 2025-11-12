@@ -1,109 +1,59 @@
-// קריאת פרמטרים מה-URL
-const params = new URLSearchParams(window.location.search);
-const hosp = params.get("hospitalization") || "";
-const amount = params.get("amount") || "";
-const patientName = params.get("patientName") || "";
-const hospDate = params.get("hospDate") || "";
-
-document.getElementById("hospitalizationNumber").textContent = hosp;
-document.getElementById("hospDate").textContent = hospDate;
-document.getElementById("amount").textContent = amount;
-document.getElementById("patientName").textContent = patientName;
-
-if (history.replaceState) {
-  history.replaceState({}, document.title, window.location.pathname);
-}
-
-const baseUrl =
-  "https://direct.tranzila.com/szmctest/iframe.php?lang=il&cred_type=1&currency=1";
-
-window.addEventListener("beforeunload", function (e) {
-  e.preventDefault();
-  e.returnValue =
-    "האם אתה בטוח שברצונך לעזוב? הקישור יפוג ותצטרך להיכנס מחדש.";
-});
-
-document.getElementById("phone").addEventListener("input", function (e) {
-  const phoneError = document.getElementById("phoneError");
-  const onlyNumbers = e.target.value.replace(/[^0-9]/g, "");
-  if (e.target.value !== onlyNumbers) {
-    e.target.value = onlyNumbers;
-  }
-  if (onlyNumbers.length > 0) {
-    phoneError.textContent = "";
-    e.target.classList.remove("error");
-  }
-});
-
-document.getElementById("preForm").addEventListener("submit", function (e) {
+document.getElementById('preForm').addEventListener('submit', function(e){
   e.preventDefault();
 
-  const fname = document.getElementById("fname").value.trim();
-  const lname = document.getElementById("lname").value.trim();
-  const address = document.getElementById("address").value.trim();
-  const phone = document.getElementById("phone").value.trim();
-  const email = document.getElementById("email").value.trim();
-  const phoneError = document.getElementById("phoneError");
+  const fname = document.getElementById('fname');
+  const lname = document.getElementById('lname');
+  const address = document.getElementById('address');
+  const phone = document.getElementById('phone');
+  const email = document.getElementById('email');
 
-  phoneError.textContent = "";
-  document.querySelectorAll("input").forEach((i) => i.classList.remove("error"));
+  let valid = true;
 
-  if (!fname) {
-    alert("נא למלא שם פרטי");
-    document.getElementById("fname").focus();
-    return;
+  ['fname', 'lname', 'address', 'phone', 'email'].forEach(id => {
+    document.getElementById(id).classList.remove('error');
+    document.getElementById(id + 'Error').textContent = '';
+  });
+
+  if (!fname.value.trim()) {
+    fname.classList.add('error');
+    document.getElementById('fnameError').textContent = 'נא למלא שם פרטי';
+    valid = false;
   }
-  if (!lname) {
-    alert("נא למלא שם משפחה");
-    document.getElementById("lname").focus();
-    return;
+  if (!lname.value.trim()) {
+    lname.classList.add('error');
+    document.getElementById('lnameError').textContent = 'נא למלא שם משפחה';
+    valid = false;
   }
-  if (!address) {
-    alert("נא למלא כתובת");
-    document.getElementById("address").focus();
-    return;
-  }
-  if (!phone) {
-    alert("נא למלא מספר טלפון");
-    document.getElementById("phone").focus();
-    return;
-  }
-  if (!/^0\d{8,9}$/.test(phone)) {
-    phoneError.textContent =
-      "מספר טלפון חייב להתחיל ב־0 ולהכיל בין 9 ל־10 ספרות";
-    document.getElementById("phone").classList.add("error");
-    document.getElementById("phone").focus();
-    return;
-  }
-  if (!email) {
-    alert("נא למלא כתובת אימייל");
-    document.getElementById("email").focus();
-    return;
-  }
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    alert("כתובת האימייל אינה תקינה");
-    document.getElementById("email").focus();
-    return;
+  if (!address.value.trim()) {
+    address.classList.add('error');
+    document.getElementById('addressError').textContent = 'נא למלא כתובת';
+    valid = false;
   }
 
-  const iframeUrl = `${baseUrl}&sum=${encodeURIComponent(
-    amount
-  )}&hospitalization=${encodeURIComponent(
-    hosp
-  )}&fname=${encodeURIComponent(fname)}&lname=${encodeURIComponent(
-    lname
-  )}&address=${encodeURIComponent(address)}&phone=${encodeURIComponent(
-    phone
-  )}&email=${encodeURIComponent(email)}`;
+  const phoneVal = phone.value.trim();
+  if (!phoneVal) {
+    phone.classList.add('error');
+    document.getElementById('phoneError').textContent = 'נא למלא מספר טלפון תקין';
+    valid = false;
+  } else if (!/^0\\d{8,9}$/.test(phoneVal)) {
+    phone.classList.add('error');
+    document.getElementById('phoneError').textContent = 'מספר טלפון חייב להתחיל ב־0 ולהכיל בין 9 ל־10 ספרות';
+    valid = false;
+  }
 
-  document.getElementById("tranzilaFrame").src = iframeUrl;
-  document.getElementById("iframeContainer").style.display = "block";
-  document.getElementById("formContainer").style.display = "none";
+  const emailVal = email.value.trim();
+  const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
+  if (!emailVal) {
+    email.classList.add('error');
+    document.getElementById('emailError').textContent = 'נא למלא כתובת אימייל תקינה';
+    valid = false;
+  } else if (!emailRegex.test(emailVal)) {
+    email.classList.add('error');
+    document.getElementById('emailError').textContent = 'כתובת המייל אינה תקינה';
+    valid = false;
+  }
+
+  if (!valid) return;
+
+  alert('הטופס תקין!');
 });
-
-function goBackToForm() {
-  document.getElementById("iframeContainer").style.display = "none";
-  document.getElementById("formContainer").style.display = "block";
-  document.getElementById("tranzilaFrame").src = "";
-}
