@@ -29,7 +29,7 @@ const baseUrl = 'https://direct.tranzila.com/szmctest/iframe.php?lang=il&cred ty
 // הגדרת הודעות חובה מותאמות אישית
 const requiredFields = [
   { id: 'fname', message: 'נא למלא שם פרטי' },
-  { id: 'lname', message: 'נא למלא שם המשפחה' },
+  { id: 'lname', message: 'נא למלא שם משפחה' },
   { id: 'address', message: 'נא למלא כתובת' },
   { id: 'phone', message: 'נא למלא מספר טלפון תקין' },
   { id: 'email', message: 'נא למלא כתובת אימייל תקינה' }
