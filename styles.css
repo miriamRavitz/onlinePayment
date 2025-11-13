@@ -260,7 +260,7 @@ footer img {
 /* מובייל */
 
 
-@media (max-width: 768px) {
+@media (max-width: 700px) {
   body {
     font-size: 16px;
     padding: 10px;
@@ -305,7 +305,7 @@ footer img {
   }
 
   .iframe-container iframe {
-    width: 100%;
+    width: 98%;
     height: 500px;
   }
 
@@ -314,6 +314,12 @@ footer img {
     text-align: center;
     margin-top: 10px;
   }
+    input:-webkit-autofill {
+  background-color: white !important;
+  -webkit-box-shadow: 0 0 0px 1000px white inset !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
 }
 
 
