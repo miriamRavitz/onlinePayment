@@ -260,7 +260,7 @@ footer img {
 /* מובייל */
 
 
-@media (max-width: 600px) {
+@media (max-width: 738px) {
   body {
     font-size: 16px;
     padding: 10px;
