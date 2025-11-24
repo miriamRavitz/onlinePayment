@@ -11,23 +11,18 @@ document.addEventListener('DOMContentLoaded', function () {
   if (encodedData) {
         let decodedString = '';
         try {
-            // *** 1. תיקון שגיאת התחביר: השורה הפכה לשורה אחת נקייה ***
-            
-            // 2. פענוח Base64 רגיל (מחזיר מחרוזת עם תווי NULL בגלל UTF-16)
+            // 1. פענוח Base64 מ-UTF-16 של SQL Server
             const utf16String = atob(encodedData); 
             
-            // 3. הסרת תווי NULL (בייט האפס) בין התווים כדי לקבל את המחרוזת הנקייה
+            // 2. הסרת תווי NULL (בייט האפס) בין התווים כדי לקבל את המחרוזת הנקייה
             for (let i = 0; i < utf16String.length; i += 2) {
-                // לוקחים רק את הבייט הראשון מכל זוג
                 decodedString += utf16String.charAt(i);
             }
             
-            // 4. חילוץ הפרמטרים מתוך המחרוזת המפוענחת
+            // 3. חילוץ הפרמטרים מתוך המחרוזת המפוענחת
             decodedString.split('&').forEach(pair => {
-              // ... בתוך decodedString.split('&').forEach(pair => { ...
                 const [key, value] = pair.split('=');
                 if (key && value) {
-                    // שימו לב: מניחים שהשמות הם בדיוק כמו ב-SQL (case-sensitive)
                     switch (key.trim()) {
                         case 'hospitalization':
                             hosp = value.trim();
@@ -36,8 +31,17 @@ document.addEventListener('DOMContentLoaded', function () {
                             amount = value.trim();
                             break;
                         case 'patientName':
-                            // חילוץ רגיל, ללא decodeURIComponent, כדי לפתור גיבריש
-                            patientName = value.trim(); 
+                            // *** הפתרון לגיבריש: אילוץ המרה ל-UTF-8 ***
+                            try {
+                                // מניחים שהעברית הגיעה כ-ISO-8859-8 או Windows-1255
+                                // המרה לבייטים ואז פענוח כ-UTF-8
+                                const bytes = Array.from(value.trim(), c => c.charCodeAt(0));
+                                patientName = decodeURIComponent(bytes.map(b => `%${b.toString(16).padStart(2, '0')}`).join(''));
+                            } catch (e) {
+                                // אם נכשל, משתמשים בערך המקורי
+                                patientName = value.trim(); 
+                                console.warn("שגיאה בהמרת שם המטופל ל-UTF-8, משתמשים במחרוזת גולמית.", e);
+                            }
                             break;
                         case 'hospDate':
                             hospDate = value.trim();
@@ -46,7 +50,6 @@ document.addEventListener('DOMContentLoaded', function () {
                             break;
                     }
                 }
-
             });
 
         } catch (e) {
