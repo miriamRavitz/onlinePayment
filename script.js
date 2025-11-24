@@ -7,27 +7,30 @@ document.addEventListener('DOMContentLoaded', function () {
     const urlParams = new URLSearchParams(window.location.search);
     const encodedData = urlParams.get('data');
 
-    if (encodedData) {
+   if (encodedData) {
+        let decodedString = '';
         try {
-            // 1. פענוח Base64 רגיל (מכיל UTF-16)
-            const utf16String = atob(encodedData); 
-            let decodedString = '';
+            // 1. המרת Base64 ל-Binary String
+            const binaryString = atob(encodedData); 
             
-            // 2. טיפול ב-BOM והסרת תווי NULL (פענוח UTF-16)
-            let startIndex = 0;
-            // בדיקת BOM של UTF-16
-            if (utf16String.length >= 2 && utf16String.charCodeAt(0) === 255 && utf16String.charCodeAt(1) === 254) {
-                 startIndex = 2;
-            } 
-
-            // הסרת תווי NULL (בייט האפס)
-            for (let i = startIndex; i < utf16String.length; i += 2) {
-                decodedString += utf16String.charAt(i);
+            // 2. יצירת מערך בייטים (Uint8Array) מה-Binary String
+            const len = binaryString.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
             }
+
+            // 3. פענוח מפורש מ-UTF-16 Little Endian (הפורמט הנפוץ ב-SQL Server)
+            // זהו הטיפול היחיד שנותר לבעיית ה-UTF-16 ששוברת את הלולאה.
+            const decoder = new TextDecoder('utf-16le');
+            decodedString = decoder.decode(bytes);
             
-            // 3. חילוץ פרמטרים
+            // 4. חילוץ פרמטרים מתוך המחרוזת הנקייה
             decodedString.split('&').forEach(pair => {
-                const [key, value] = pair.split('=');
+                // ניקוי תווי NULL שעלולים להישאר (במיוחד אם יש BOM)
+                const cleanPair = pair.replace(/\0/g, ''); 
+                const [key, value] = cleanPair.split('=');
+                
                 if (key && value) {
                     switch (key.trim()) {
                         case 'hospitalization':
@@ -37,9 +40,8 @@ document.addEventListener('DOMContentLoaded', function () {
                             amount = value.trim();
                             break;
                         case 'patientName':
-                            // טיפול פשוט: נמנעים מכל המרה מורכבת ששוברת את הלולאה. 
-                            // השם יוצג כגיבריש, אבל שאר הנתונים ייכנסו.
-                            patientName = value.trim(); 
+                            // נמנעים מכל טיפול מורכב ונשתמש בערך הגולמי
+                            patientName = value.trim();
                             break;
                         case 'hospDate':
                             hospDate = value.trim();
@@ -51,7 +53,6 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
         } catch (e) {
-            // אם הפענוח הבסיסי נכשל, נרשום את השגיאה, אך נמשיך הלאה
             console.error("שגיאה קריטית בפענוח Base64:", e);
         }
     }
