@@ -1,40 +1,32 @@
 document.addEventListener('DOMContentLoaded', function () {
-    // 1. קליטת מחרוזת ה-Base64 מה-URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const encodedData = urlParams.get('data'); // מקבלים רק את הפרמטר 'data'
-
     let hosp = '';
     let amount = '';
     let patientName = '';
     let hospDate = '';
 
-if (encodedData) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const encodedData = urlParams.get('data');
+
+    if (encodedData) {
         let decodedString = '';
         try {
-            // 1. פענוח Base64 רגיל (מחזיר מחרוזת עם תווי NULL)
+            // 1. פענוח Base64 רגיל (מכיל UTF-16)
             const utf16String = atob(encodedData); 
+            
+            // 2. טיפול ב-BOM (Byte Order Mark) ובייטי NULL
+            let startIndex = 0;
+            if (utf16String.length >= 2 && utf16String.charCodeAt(0) === 255 && utf16String.charCodeAt(1) === 254) {
+                 startIndex = 2; // דילוג על BOM
+            } 
 
-            // 2. המרה ל-Uint8Array
-            // שלב זה מסיר את תווי ה-NULL וה-BOM באופן בטוח, ומייצר מערך בייטים גולמי.
-            const dataBytes = new Uint8Array(utf16String.length);
-            for (let i = 0; i < utf16String.length; i++) {
-                // לוקחים את קוד התו (הבייט)
-                dataBytes[i] = utf16String.charCodeAt(i);
+            // 3. הסרת תווי NULL (בייט האפס) והמשך החל מה-startIndex
+            for (let i = startIndex; i < utf16String.length; i += 2) {
+                decodedString += utf16String.charAt(i);
             }
-
-            // 3. פענוח מ-UTF-16 ל-JavaScript String באמצעות TextDecoder (השיטה הכי אמינה)
-            // TextDecoder יכול לטפל ב-BOM ובייטים ריקים בצורה טובה יותר.
-            // אנו מנסים פענוח כ-UTF-16LE, שהוא הקידוד ש-SQL Server כמעט תמיד משתמש בו.
-            const decoder = new TextDecoder('utf-16le');
-            decodedString = decoder.decode(dataBytes);
-
             
             // 4. חילוץ הפרמטרים מתוך המחרוזת הנקייה
             decodedString.split('&').forEach(pair => {
-                // ניקוי תווי NULL שנותרו
-                const cleanPair = pair.replace(/\0/g, ''); 
-                const [key, value] = cleanPair.split('=');
-                
+                const [key, value] = pair.split('=');
                 if (key && value) {
                     switch (key.trim()) {
                         case 'hospitalization':
@@ -44,9 +36,18 @@ if (encodedData) {
                             amount = value.trim();
                             break;
                         case 'patientName':
-                            // השם אמור להיות UTF-8 תקין בשלב זה, או URL-encoded.
-                            // ננסה URL decode כדי לטפל בתווים מיוחדים.
-                            patientName = decodeURIComponent(value.trim()); 
+                            // *** הפתרון הסופי לגיבריש! ***
+                            // אילוץ המרה מקידוד ישן (הגורם לגיבריש) ל-UTF-8
+                            try {
+                                const rawValue = value.trim();
+                                // המרת התווים לבייטים, ואז שימוש ב-decodeURIComponent כדי להמיר ל-UTF-8
+                                const bytes = Array.from(rawValue, c => c.charCodeAt(0));
+                                patientName = decodeURIComponent(bytes.map(b => `%${b.toString(16).padStart(2, '0')}`).join(''));
+                            } catch (e) {
+                                // במקרה של כשל, נחזור לערך גולמי וניידע בקונסול
+                                patientName = value.trim(); 
+                                console.error("שגיאה בהמרת שם המטופל ל-UTF-8, משתמשים בערך גולמי.", e);
+                            }
                             break;
                         case 'hospDate':
                             hospDate = value.trim();
@@ -61,6 +62,7 @@ if (encodedData) {
             console.error("שגיאה בפענוח Base64 או חילוץ פרמטרים:", e);
         }
     }
+    
 
     // בדיקת חובה לאחר ניסיון הפענוח
     if (!hosp || !amount || !patientName || !hospDate) {
