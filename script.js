@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', function () {
             
             // 4. חילוץ הפרמטרים מתוך המחרוזת המפוענחת
             decodedString.split('&').forEach(pair => {
+              // ... בתוך decodedString.split('&').forEach(pair => { ...
                 const [key, value] = pair.split('=');
                 if (key && value) {
                     // שימו לב: מניחים שהשמות הם בדיוק כמו ב-SQL (case-sensitive)
@@ -35,8 +36,8 @@ document.addEventListener('DOMContentLoaded', function () {
                             amount = value.trim();
                             break;
                         case 'patientName':
-                            // פענוח ה-URL Encoded הנותר בשם (בגלל שהפעולה נעשתה דרך SQL)
-                            patientName = decodeURIComponent(value.trim()); 
+                            // חילוץ רגיל, ללא decodeURIComponent, כדי לפתור גיבריש
+                            patientName = value.trim(); 
                             break;
                         case 'hospDate':
                             hospDate = value.trim();
@@ -45,6 +46,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             break;
                     }
                 }
+
             });
 
         } catch (e) {
