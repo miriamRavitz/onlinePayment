@@ -36,17 +36,34 @@ document.addEventListener('DOMContentLoaded', function () {
                         case 'amount':
                             amount = value.trim();
                             break;
-                        case 'patientName':
-                            // ננסה לפענח URI רק אם נראה URL-encoded, אחרת נשאיר כפי שהוא (גיבריש)
-                            if (value.includes('%')) {
-                                try {
-                                    patientName = decodeURIComponent(value.trim());
-                                } catch (e) {
-                                    patientName = value.trim(); // אם נכשל decode, נשאיר את הערך
+case 'patientName':
+                            const rawValue = value.trim();
+                            let tempName = rawValue;
+
+                            // 1. נסו תמיד לפענח URI, אך עטפו אותו ב-try/catch כדי למנוע שבירת הלולאה
+                            try {
+                                tempName = decodeURIComponent(rawValue);
+                                // אם הפענוח הצליח והתוצאה היא עברית (לא גיבריש), נשתמש בה
+                                if (tempName !== rawValue) {
+                                    patientName = tempName;
+                                    break;
                                 }
-                            } else {
-                                // אם זה הגיבריש הישיר, נשאיר אותו גולמי.
-                                patientName = value.trim(); 
+                            } catch (e) {
+                                // אם ה-URI malformed, נמשיך לטיפול בגיבריש
+                            }
+
+                            // 2. אם הפענוח נכשל (או החזיר את אותו ערך), נניח שמדובר בגיבריש (ISO/Windows)
+                            try {
+                                const bytes = Array.from(rawValue, c => c.charCodeAt(0));
+                                // המרה מפורשת מ-windows-1255 ל-UTF-8
+                                const isoString = String.fromCharCode.apply(null, bytes);
+                                const decoder = new TextDecoder('windows-1255');
+                                const encoder = new TextEncoder();
+                                
+                                patientName = decoder.decode(encoder.encode(isoString));
+                            } catch (e) {
+                                // אם הכל נכשל, נשתמש בערך הגולמי (הגיבריש יוצג)
+                                patientName = rawValue;
                             }
                             break;
                         case 'hospDate':
