@@ -29,51 +29,23 @@ document.addEventListener('DOMContentLoaded', function () {
             decodedString.split('&').forEach(pair => {
                 const [key, value] = pair.split('=');
                 if (key && value) {
-                    switch (key.trim()) {
-                        case 'hospitalization':
-                            hosp = value.trim();
-                            break;
-                        case 'amount':
-                            amount = value.trim();
-                            break;
-case 'patientName':
-                            const rawValue = value.trim();
-                            let tempName = rawValue;
-
-                            // 1. נסו תמיד לפענח URI, אך עטפו אותו ב-try/catch כדי למנוע שבירת הלולאה
-                            try {
-                                tempName = decodeURIComponent(rawValue);
-                                // אם הפענוח הצליח והתוצאה היא עברית (לא גיבריש), נשתמש בה
-                                if (tempName !== rawValue) {
-                                    patientName = tempName;
-                                    break;
-                                }
-                            } catch (e) {
-                                // אם ה-URI malformed, נמשיך לטיפול בגיבריש
-                            }
-
-                            // 2. אם הפענוח נכשל (או החזיר את אותו ערך), נניח שמדובר בגיבריש (ISO/Windows)
-                            try {
-                                const bytes = Array.from(rawValue, c => c.charCodeAt(0));
-                                // המרה מפורשת מ-windows-1255 ל-UTF-8
-                                const isoString = String.fromCharCode.apply(null, bytes);
-                                const decoder = new TextDecoder('windows-1255');
-                                const encoder = new TextEncoder();
-                                
-                                patientName = decoder.decode(encoder.encode(isoString));
-                            } catch (e) {
-                                // אם הכל נכשל, נשתמש בערך הגולמי (הגיבריש יוצג)
-                                patientName = rawValue;
-                            }
-                            break;
-                        case 'hospDate':
-                            hospDate = value.trim();
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            });
+       switch (key.trim()) {
+                        case 'hospitalization':
+                            hosp = value.trim();
+                            break;
+                        case 'amount':
+                            amount = value.trim();
+                            break;
+                        case 'patientName':
+                            // חוזרים לטיפול הפשוט ביותר, כדי לא לשבור את הקוד.
+                            patientName = value.trim(); 
+                            break;
+                        case 'hospDate':
+                            hospDate = value.trim();
+                            break;
+                        default:
+                            break;
+                    }
 
         } catch (e) {
             // אם הפענוח הבסיסי נכשל, נרשום את השגיאה
@@ -82,7 +54,7 @@ case 'patientName':
     }
    
      // בדיקת חובה לאחר ניסיון הפענוח
-    if (!hosp || !amount || !patientName || !hospDate) {
+    if (!hosp || !amount || !hospDate) {
         document.body.innerHTML = `
             <div style="text-align: center; padding: 40px; font-size: 1.4em; color: darkred;">
                 נראה שהלינק פגום,<br>יש להיכנס מחדש ללינק שקיבלת בהודעה מהמרכז הרפואי.
