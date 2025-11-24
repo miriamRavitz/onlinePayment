@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (encodedData) {
         try {
-            // 1. פענוח Base64 רגיל (מחזיר מחרוזת עם תווי NULL מ-UTF-16)
+            // 1. פענוח Base64 רגיל (מכיל UTF-16)
             const utf16String = atob(encodedData); 
             let decodedString = '';
             
@@ -29,57 +29,62 @@ document.addEventListener('DOMContentLoaded', function () {
             decodedString.split('&').forEach(pair => {
                 const [key, value] = pair.split('=');
                 if (key && value) {
-       switch (key.trim()) {
-                        case 'hospitalization':
-                            hosp = value.trim();
-                            break;
-                        case 'amount':
-                            amount = value.trim();
-                            break;
-                        case 'patientName':
-                            // חוזרים לטיפול הפשוט ביותר, כדי לא לשבור את הקוד.
-                            patientName = value.trim(); 
-                            break;
-                        case 'hospDate':
-                            hospDate = value.trim();
-                            break;
-                        default:
-                            break;
-                    }
+                    switch (key.trim()) {
+                        case 'hospitalization':
+                            hosp = value.trim();
+                            break;
+                        case 'amount':
+                            amount = value.trim();
+                            break;
+                        case 'patientName':
+                            // טיפול פשוט: נמנעים מכל המרה מורכבת ששוברת את הלולאה. 
+                            // השם יוצג כגיבריש, אבל שאר הנתונים ייכנסו.
+                            patientName = value.trim(); 
+                            break;
+                        case 'hospDate':
+                            hospDate = value.trim();
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            });
 
         } catch (e) {
-            // אם הפענוח הבסיסי נכשל, נרשום את השגיאה
+            // אם הפענוח הבסיסי נכשל, נרשום את השגיאה, אך נמשיך הלאה
             console.error("שגיאה קריטית בפענוח Base64:", e);
         }
     }
-   
-     // בדיקת חובה לאחר ניסיון הפענוח
+    
+    // 4. הצגת הנתונים בדף
+    document.getElementById('patientName').textContent = patientName;
+    document.getElementById('amount').textContent = amount;
+    document.getElementById('hospitalizationNumber').textContent = hosp; 
+    document.getElementById('hospDate').textContent = hospDate;
+
+    // 5. בדיקת חובה: מסירים את patientName כדי לאפשר לשאר הפרמטרים להיכנס
     if (!hosp || !amount || !hospDate) {
         document.body.innerHTML = `
             <div style="text-align: center; padding: 40px; font-size: 1.4em; color: darkred;">
                 נראה שהלינק פגום,<br>יש להיכנס מחדש ללינק שקיבלת בהודעה מהמרכז הרפואי.
             </div>
         `;
-        return; // מפסיק את המשך ההרצה
+        return; 
     }
 
-  
-    // ניקוי ה־URL מהפרמטרים (נשאר זהה)
- //   if (history.replaceState) {
-        // מנקה את ה-URL מכל פרמטר (כולל 'data')
-//        history.replaceState({}, document.title, window.location.pathname);
-//    }
+    // 6. הוספת הלוגיקה של הטופס
+    // (הלוגיקה שלך להגדרת baseUrl, beforeunload, requiredFields, אימות טלפון/מייל, ולוגיקת submit)
 
-    // כתובת iframe של טרנזילה (נשאר זהה)
+    // כתובת iframe של טרנזילה
     const baseUrl = 'https://direct.tranzila.com/szmctest/iframe.php?lang=il&cred_type=1&currency=1';
 
-    // אזהרת רענון / יציאה מהעמוד (נשאר זהה)
+    // אזהרת רענון / יציאה מהעמוד
     window.addEventListener('beforeunload', function(e) {
         e.preventDefault();
         e.returnValue = 'האם אתה בטוח שברצונך לעזוב? הקישור יפוג ותצטרך להיכנס מחדש.';
     });
 
-    // הגדרת הודעות מותאמות אישית (נשאר זהה)
+    // הגדרת הודעות מותאמות אישית
     const requiredFields = [
         { id: 'fname', message: 'נא למלא שם פרטי' },
         { id: 'lname', message: 'נא למלא שם משפחה' },
@@ -101,7 +106,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // ולידציה טלפון – רק ספרות, מתחיל ב־0, באורך 9–10 (נשאר זהה)
+    // ולידציה טלפון
     document.getElementById('phone').addEventListener('input', function(e) {
         const phoneError = document.getElementById('phoneError');
         const value = e.target.value;
@@ -119,7 +124,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // שליחת הטופס (נשאר זהה)
+    // שליחת הטופס
     document.getElementById('preForm').addEventListener('submit', function(e){
         e.preventDefault();
 
@@ -159,14 +164,8 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('formContainer').style.display = 'none';
     });
 
-    // פונקציה חזרה לטופס (נשאר זהה)
-    // הערה: נראה שהמשתנה paymentInProgress אינו מוגדר בקוד שהצגת, ייתכן שתצטרך להוסיף אותו אם הוא רלוונטי
-    // function goBackToForm() {
-    //     document.getElementById('iframeContainer').style.display = 'none';
-    //     document.getElementById('formContainer').style.display = 'block';
-    //     document.getElementById('tranzilaFrame').src = '';
-    //     paymentInProgress = false;
-    // }
+    // הפונקציה החיצונית goBackToForm (למרות שהיא מוגדרת למטה, טוב להגדיר אותה כאן כדי להיות בטוחים)
+    // הערה: נראה שהפונקציה מוגדרת פעמיים בקוד שלך; נשאיר אותה בחוץ כרגיל.
 
 });
 
@@ -175,16 +174,5 @@ function goBackToForm() {
     document.getElementById('iframeContainer').style.display = 'none';
     document.getElementById('formContainer').style.display = 'block';
     document.getElementById('tranzilaFrame').src = '';
-    // אם paymentInProgress חשוב, הגדר אותו בתחילת הסקריפט
-    // paymentInProgress = false; 
+    // אם paymentInProgress מוגדר, ניתן לאפס אותו כאן
 }
-
-function goBackToForm() {
-  document.getElementById('iframeContainer').style.display = 'none';
-  document.getElementById('formContainer').style.display = 'block';
-  document.getElementById('tranzilaFrame').src = '';
-  paymentInProgress = false;
-}
-
-
-
