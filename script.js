@@ -43,8 +43,17 @@ document.addEventListener('DOMContentLoaded', function () {
                             // נמנעים מכל טיפול מורכב ונשתמש בערך הגולמי
                             patientName = value.trim();
                             break;
-                        case 'hospDate':
-                            hospDate = value.trim();
+                      case 'hospDate':
+                            const rawDate = value.trim(); // לדוגמה: "2025-01-01"
+                            // פיצול התאריך לחלקים: [שנה, חודש, יום]
+                            const parts = rawDate.split('-'); 
+                            
+                            // סידור מחדש לפורמט DD-MM-YYYY
+                            if (parts.length === 3) {
+                                hospDate = parts[2] + '-' + parts[1] + '-' + parts[0]; // לדוגמה: "01-01-2025"
+                            } else {
+                                hospDate = rawDate; // אם הפורמט לא תקין, נשתמש בערך המקורי
+                            }
                             break;
                         default:
                             break;
