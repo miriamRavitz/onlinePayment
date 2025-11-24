@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const urlParams = new URLSearchParams(window.location.search);
     const encodedData = urlParams.get('data');
 
-   if (encodedData) {
+ if (encodedData) {
         let decodedString = '';
         try {
             // 1. המרת Base64 ל-Binary String
