@@ -8,15 +8,22 @@ document.addEventListener('DOMContentLoaded', function () {
     let patientName = '';
     let hospDate = '';
 
-if (encodedData) {
+    if (encodedData) {
     try {
-        // פענוח Base64 (תומך ב-Unicode, בשורה אחת נכונה)
-        const decodedString = decodeURIComponent(atob(encodedData).split('').map(function(c) {
-            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-        }).join('')); // <--- שים לב: הסוגריים נסגרים כאן וזהו!
+        // 1. פענוח Base64 רגיל (מחזיר מחרוזת עם תווי NULL בגלל UTF-16)
+        const utf16String = atob(encodedData); 
+        
+        // 2. הסרת תווי NULL (בייט האפס) בין התווים
+        let decodedString = '';
+        for (let i = 0; i < utf16String.length; i += 2) {
+            // התווים ב-UTF-16 הם זוגות, כשהבייט השני הוא אפס.
+            // לוקחים רק את הבייט הראשון (התו האמיתי)
+            decodedString += utf16String.charAt(i);
+        }
 
-        // חילוץ הפרמטרים מתוך המחרוזת המפוענחת
+        // 3. עכשיו שיש לנו את המחרוזת הנקייה (עם עברית תקינה), ממשיכים בחילוץ
         decodedString.split('&').forEach(pair => {
+
             const [key, value] = pair.split('=');
             if (key && value) {
                 // שימו לב: מניחים שהשמות הם בדיוק כמו ב-SQL (case-sensitive)
