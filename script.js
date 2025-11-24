@@ -11,13 +11,27 @@ document.addEventListener('DOMContentLoaded', function () {
  if (encodedData) {
         let decodedString = '';
         try {
-            // *** 1. פענוח Base64: חוזרים לשיטה של UTF-8/URI ***
-            // זה נדרש כי Base64 לא עובד טוב עם תווים שאינם ASCII
-            decodedString = decodeURIComponent(atob(encodedData).split('').map(function(c) {
-                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-            }).join(''));
+            // *** 1. פענוח Base64 רגיל ***
+            const utf16String = atob(encodedData); 
+            
+            // 2. הסרת תווי BOM (בדרך כלל 2 או 4 בייטים) שמופיעים בתחילת המחרוזת 
+            // ומפריעים לפענוח ה-UTF-16
+            let startIndex = 0;
+            // אם התו הראשון הוא NULL, יש BOM. מתחילים מהתו השלישי או החמישי
+            if (utf16String.charCodeAt(0) === 0) {
+                // מנסים לדלג על BOM של 2 או 4 בייטים
+                startIndex = (utf16String.charCodeAt(1) === 0) ? 4 : 2; 
+            } else {
+                // אם מתחיל בתו לא-NULL, התחל מההתחלה
+                startIndex = 0;
+            }
 
-            // 2. חילוץ הפרמטרים מתוך המחרוזת המפוענחת
+            // 3. הסרת תווי NULL (בייט האפס) בין התווים כדי לקבל את המחרוזת הנקייה
+            for (let i = startIndex; i < utf16String.length; i += 2) {
+                decodedString += utf16String.charAt(i);
+            }
+            
+            // 4. חילוץ הפרמטרים מתוך המחרוזת המפוענחת
             decodedString.split('&').forEach(pair => {
                 const [key, value] = pair.split('=');
                 if (key && value) {
@@ -29,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             amount = value.trim();
                             break;
                         case 'patientName':
-                            // נשתמש בערך המפוענח ישירות. ה-decodeURIComponent החיצוני כבר טיפל בזה.
+                            // נחזור לחילוץ רגיל. אם השם עדיין משובש, זה הקידוד ב-SQL
                             patientName = value.trim(); 
                             break;
                         case 'hospDate':
