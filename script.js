@@ -35,18 +35,31 @@ document.addEventListener('DOMContentLoaded', function () {
                         case 'amount':
                             amount = value.trim();
                             break;
-                        case 'patientName':
-                            // *** הפתרון הסופי לגיבריש! ***
-                            // אילוץ המרה מקידוד ישן (הגורם לגיבריש) ל-UTF-8
-                            try {
-                                const rawValue = value.trim();
-                                // המרת התווים לבייטים, ואז שימוש ב-decodeURIComponent כדי להמיר ל-UTF-8
-                                const bytes = Array.from(rawValue, c => c.charCodeAt(0));
-                                patientName = decodeURIComponent(bytes.map(b => `%${b.toString(16).padStart(2, '0')}`).join(''));
-                            } catch (e) {
-                                // במקרה של כשל, נחזור לערך גולמי וניידע בקונסול
-                                patientName = value.trim(); 
-                                console.error("שגיאה בהמרת שם המטופל ל-UTF-8, משתמשים בערך גולמי.", e);
+                       case 'patientName':
+                            const rawValue = value.trim();
+                            
+                            // *** 1. בדיקה אם המחרוזת כבר URL-Encoded (הדרך הנכונה יותר) ***
+                            if (rawValue.includes('%')) {
+                                try {
+                                    // מנסים לפענח כ-URL-Encoded רגיל (UTF-8)
+                                    patientName = decodeURIComponent(rawValue);
+                                } catch (e) {
+                                    // אם נכשל, זהו רצף URI שבור. נשתמש בערך הגולמי
+                                    patientName = rawValue;
+                                    console.error("שגיאה בפענוח URI של שם המטופל.", e);
+                                }
+                            } 
+                            // *** 2. אם אין קידוד URL, מניחים שהוא גיבריש (Windows-1255/ISO) ***
+                            else {
+                                try {
+                                    // אילוץ המרה מקידוד ישן ל-UTF-8 כדי לפתור את הגיבריש
+                                    const bytes = Array.from(rawValue, c => c.charCodeAt(0));
+                                    patientName = decodeURIComponent(bytes.map(b => `%${b.toString(16).padStart(2, '0')}`).join(''));
+                                } catch (e) {
+                                    // אם נכשל, נשתמש בערך הגולמי
+                                    patientName = rawValue;
+                                    console.error("שגיאה בהמרת שם המטופל ל-UTF-8 סופי.", e);
+                                }
                             }
                             break;
                         case 'hospDate':
