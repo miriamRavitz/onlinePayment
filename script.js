@@ -8,18 +8,16 @@ document.addEventListener('DOMContentLoaded', function () {
     let patientName = '';
     let hospDate = '';
 
-  if (encodedData) {
+ if (encodedData) {
         let decodedString = '';
         try {
-            // 1. פענוח Base64 מ-UTF-16 של SQL Server
-            const utf16String = atob(encodedData); 
-            
-            // 2. הסרת תווי NULL (בייט האפס) בין התווים כדי לקבל את המחרוזת הנקייה
-            for (let i = 0; i < utf16String.length; i += 2) {
-                decodedString += utf16String.charAt(i);
-            }
-            
-            // 3. חילוץ הפרמטרים מתוך המחרוזת המפוענחת
+            // *** 1. פענוח Base64: חוזרים לשיטה של UTF-8/URI ***
+            // זה נדרש כי Base64 לא עובד טוב עם תווים שאינם ASCII
+            decodedString = decodeURIComponent(atob(encodedData).split('').map(function(c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+
+            // 2. חילוץ הפרמטרים מתוך המחרוזת המפוענחת
             decodedString.split('&').forEach(pair => {
                 const [key, value] = pair.split('=');
                 if (key && value) {
@@ -31,17 +29,8 @@ document.addEventListener('DOMContentLoaded', function () {
                             amount = value.trim();
                             break;
                         case 'patientName':
-                            // *** הפתרון לגיבריש: אילוץ המרה ל-UTF-8 ***
-                            try {
-                                // מניחים שהעברית הגיעה כ-ISO-8859-8 או Windows-1255
-                                // המרה לבייטים ואז פענוח כ-UTF-8
-                                const bytes = Array.from(value.trim(), c => c.charCodeAt(0));
-                                patientName = decodeURIComponent(bytes.map(b => `%${b.toString(16).padStart(2, '0')}`).join(''));
-                            } catch (e) {
-                                // אם נכשל, משתמשים בערך המקורי
-                                patientName = value.trim(); 
-                                console.warn("שגיאה בהמרת שם המטופל ל-UTF-8, משתמשים במחרוזת גולמית.", e);
-                            }
+                            // נשתמש בערך המפוענח ישירות. ה-decodeURIComponent החיצוני כבר טיפל בזה.
+                            patientName = value.trim(); 
                             break;
                         case 'hospDate':
                             hospDate = value.trim();
