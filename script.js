@@ -11,18 +11,16 @@ document.addEventListener('DOMContentLoaded', function () {
 if (encodedData) {
         let decodedString = '';
         try {
-            // *** 1. פענוח Base64 רגיל (מחזיר מחרוזת עם תווי NULL) ***
+            // 1. פענוח Base64 רגיל (מכיל UTF-16)
             const utf16String = atob(encodedData); 
             
-            // 2. טיפול ב-BOM (Byte Order Mark) ובייטי NULL
+            // 2. טיפול ב-BOM (Byte Order Mark) - נחוץ אם SQL Server מכניס BOM
             let startIndex = 0;
-            // ניסיון לדלג על BOM של UTF-16 (בדרך כלל 2 בייטים)
             if (utf16String.length >= 2 && utf16String.charCodeAt(0) === 255 && utf16String.charCodeAt(1) === 254) {
                  startIndex = 2;
             } 
 
             // 3. הסרת תווי NULL (בייט האפס) והמשך החל מה-startIndex
-            // זה מנקה את ה-UTF-16
             for (let i = startIndex; i < utf16String.length; i += 2) {
                 decodedString += utf16String.charAt(i);
             }
@@ -39,8 +37,16 @@ if (encodedData) {
                             amount = value.trim();
                             break;
                         case 'patientName':
-                            // הפענוח הנדרש לעברית (URL Encoded)
-                            patientName = decodeURIComponent(value.trim()); 
+                            // *** הפתרון הסופי לגיבריש! ***
+                            // המרה מפורשת של הקידוד הישן (Windows-1255/ISO) ל-UTF-8
+                            try {
+                                const rawValue = value.trim();
+                                const bytes = Array.from(rawValue, c => c.charCodeAt(0));
+                                patientName = decodeURIComponent(bytes.map(b => `%${b.toString(16).padStart(2, '0')}`).join(''));
+                            } catch (e) {
+                                patientName = value.trim(); 
+                                console.error("שגיאה בהמרת שם המטופל ל-UTF-8 סופי, חוזרים לערך גולמי.", e);
+                            }
                             break;
                         case 'hospDate':
                             hospDate = value.trim();
