@@ -8,30 +8,26 @@ document.addEventListener('DOMContentLoaded', function () {
     let patientName = '';
     let hospDate = '';
 
- if (encodedData) {
+if (encodedData) {
         let decodedString = '';
         try {
-            // *** 1. פענוח Base64 רגיל ***
+            // 1. פענוח Base64 רגיל
             const utf16String = atob(encodedData); 
             
-            // 2. הסרת תווי BOM (בדרך כלל 2 או 4 בייטים) שמופיעים בתחילת המחרוזת 
-            // ומפריעים לפענוח ה-UTF-16
+            // 2. טיפול ב-BOM (Byte Order Mark) שעלול לגרום לבעיות
             let startIndex = 0;
-            // אם התו הראשון הוא NULL, יש BOM. מתחילים מהתו השלישי או החמישי
-            if (utf16String.charCodeAt(0) === 0) {
-                // מנסים לדלג על BOM של 2 או 4 בייטים
-                startIndex = (utf16String.charCodeAt(1) === 0) ? 4 : 2; 
-            } else {
-                // אם מתחיל בתו לא-NULL, התחל מההתחלה
-                startIndex = 0;
-            }
+            // בדיקת BOM של UTF-16 (0xFFFE)
+            if (utf16String.length >= 2 && utf16String.charCodeAt(0) === 255 && utf16String.charCodeAt(1) === 254) {
+                 startIndex = 2;
+            } 
 
-            // 3. הסרת תווי NULL (בייט האפס) בין התווים כדי לקבל את המחרוזת הנקייה
+            // 3. הסרת תווי NULL (בייט האפס) והמשך החל מה-startIndex
             for (let i = startIndex; i < utf16String.length; i += 2) {
+                // לוקחים רק את התו שבאינדקס הזוגי
                 decodedString += utf16String.charAt(i);
             }
             
-            // 4. חילוץ הפרמטרים מתוך המחרוזת המפוענחת
+            // 4. חילוץ הפרמטרים
             decodedString.split('&').forEach(pair => {
                 const [key, value] = pair.split('=');
                 if (key && value) {
@@ -43,8 +39,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             amount = value.trim();
                             break;
                         case 'patientName':
-                            // נחזור לחילוץ רגיל. אם השם עדיין משובש, זה הקידוד ב-SQL
-                            patientName = value.trim(); 
+                            patientName = decodeURIComponent(value.trim()); 
                             break;
                         case 'hospDate':
                             hospDate = value.trim();
