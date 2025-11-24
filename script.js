@@ -11,23 +11,30 @@ document.addEventListener('DOMContentLoaded', function () {
 if (encodedData) {
         let decodedString = '';
         try {
-            // 1. פענוח Base64 רגיל (מכיל UTF-16)
+            // 1. פענוח Base64 רגיל (מחזיר מחרוזת עם תווי NULL)
             const utf16String = atob(encodedData); 
-            
-            // 2. טיפול ב-BOM (Byte Order Mark) - נחוץ אם SQL Server מכניס BOM
-            let startIndex = 0;
-            if (utf16String.length >= 2 && utf16String.charCodeAt(0) === 255 && utf16String.charCodeAt(1) === 254) {
-                 startIndex = 2;
-            } 
 
-            // 3. הסרת תווי NULL (בייט האפס) והמשך החל מה-startIndex
-            for (let i = startIndex; i < utf16String.length; i += 2) {
-                decodedString += utf16String.charAt(i);
+            // 2. המרה ל-Uint8Array
+            // שלב זה מסיר את תווי ה-NULL וה-BOM באופן בטוח, ומייצר מערך בייטים גולמי.
+            const dataBytes = new Uint8Array(utf16String.length);
+            for (let i = 0; i < utf16String.length; i++) {
+                // לוקחים את קוד התו (הבייט)
+                dataBytes[i] = utf16String.charCodeAt(i);
             }
+
+            // 3. פענוח מ-UTF-16 ל-JavaScript String באמצעות TextDecoder (השיטה הכי אמינה)
+            // TextDecoder יכול לטפל ב-BOM ובייטים ריקים בצורה טובה יותר.
+            // אנו מנסים פענוח כ-UTF-16LE, שהוא הקידוד ש-SQL Server כמעט תמיד משתמש בו.
+            const decoder = new TextDecoder('utf-16le');
+            decodedString = decoder.decode(dataBytes);
+
             
             // 4. חילוץ הפרמטרים מתוך המחרוזת הנקייה
             decodedString.split('&').forEach(pair => {
-                const [key, value] = pair.split('=');
+                // ניקוי תווי NULL שנותרו
+                const cleanPair = pair.replace(/\0/g, ''); 
+                const [key, value] = cleanPair.split('=');
+                
                 if (key && value) {
                     switch (key.trim()) {
                         case 'hospitalization':
@@ -37,16 +44,9 @@ if (encodedData) {
                             amount = value.trim();
                             break;
                         case 'patientName':
-                            // *** הפתרון הסופי לגיבריש! ***
-                            // המרה מפורשת של הקידוד הישן (Windows-1255/ISO) ל-UTF-8
-                            try {
-                                const rawValue = value.trim();
-                                const bytes = Array.from(rawValue, c => c.charCodeAt(0));
-                                patientName = decodeURIComponent(bytes.map(b => `%${b.toString(16).padStart(2, '0')}`).join(''));
-                            } catch (e) {
-                                patientName = value.trim(); 
-                                console.error("שגיאה בהמרת שם המטופל ל-UTF-8 סופי, חוזרים לערך גולמי.", e);
-                            }
+                            // השם אמור להיות UTF-8 תקין בשלב זה, או URL-encoded.
+                            // ננסה URL decode כדי לטפל בתווים מיוחדים.
+                            patientName = decodeURIComponent(value.trim()); 
                             break;
                         case 'hospDate':
                             hospDate = value.trim();
