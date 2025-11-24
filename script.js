@@ -11,23 +11,23 @@ document.addEventListener('DOMContentLoaded', function () {
 if (encodedData) {
         let decodedString = '';
         try {
-            // 1. פענוח Base64 רגיל
+            // *** 1. פענוח Base64 רגיל (מחזיר מחרוזת עם תווי NULL) ***
             const utf16String = atob(encodedData); 
             
-            // 2. טיפול ב-BOM (Byte Order Mark) שעלול לגרום לבעיות
+            // 2. טיפול ב-BOM (Byte Order Mark) ובייטי NULL
             let startIndex = 0;
-            // בדיקת BOM של UTF-16 (0xFFFE)
+            // ניסיון לדלג על BOM של UTF-16 (בדרך כלל 2 בייטים)
             if (utf16String.length >= 2 && utf16String.charCodeAt(0) === 255 && utf16String.charCodeAt(1) === 254) {
                  startIndex = 2;
             } 
 
             // 3. הסרת תווי NULL (בייט האפס) והמשך החל מה-startIndex
+            // זה מנקה את ה-UTF-16
             for (let i = startIndex; i < utf16String.length; i += 2) {
-                // לוקחים רק את התו שבאינדקס הזוגי
                 decodedString += utf16String.charAt(i);
             }
             
-            // 4. חילוץ הפרמטרים
+            // 4. חילוץ הפרמטרים מתוך המחרוזת הנקייה
             decodedString.split('&').forEach(pair => {
                 const [key, value] = pair.split('=');
                 if (key && value) {
@@ -39,6 +39,7 @@ if (encodedData) {
                             amount = value.trim();
                             break;
                         case 'patientName':
+                            // הפענוח הנדרש לעברית (URL Encoded)
                             patientName = decodeURIComponent(value.trim()); 
                             break;
                         case 'hospDate':
