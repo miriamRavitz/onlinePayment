@@ -11,8 +11,9 @@ document.addEventListener('DOMContentLoaded', function () {
     if (encodedData) {
         try {
             // פענוח Base64 (תומך בתווי Unicode כמו עברית)
-            const decodedString = decodeURIComponent(atob(encodedData).split('').map(function(c) {
-                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+          const decodedString = decodeURIComponent(atob(encodedData).split('').map(function(c) {
+    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+}).join('')); ('00' + c.charCodeAt(0).toString(16)).slice(-2);
             }).join(''));
 
             // חילוץ הפרמטרים מתוך המחרוזת המפוענחת
