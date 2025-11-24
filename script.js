@@ -8,42 +8,42 @@ document.addEventListener('DOMContentLoaded', function () {
     let patientName = '';
     let hospDate = '';
 
-    if (encodedData) {
-        try {
-            // פענוח Base64 (תומך בתווי Unicode כמו עברית)
-          const decodedString = decodeURIComponent(atob(encodedData).split('').map(function(c) {
-    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-}).join('')); ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-            }).join(''));
+if (encodedData) {
+    try {
+        // פענוח Base64 (תומך בתווי Unicode כמו עברית)
+        // שורה אחת, ללא כפילויות, סוגריים תקינים
+        const decodedString = decodeURIComponent(atob(encodedData).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
 
-            // חילוץ הפרמטרים מתוך המחרוזת המפוענחת
-            decodedString.split('&').forEach(pair => {
-                const [key, value] = pair.split('=');
-                if (key && value) {
-                    // שימו לב: מניחים שהשמות הם בדיוק כמו ב-SQL (case-sensitive)
-                    switch (key.trim()) {
-                        case 'hospitalization':
-                            hosp = value.trim();
-                            break;
-                        case 'amount':
-                            amount = value.trim();
-                            break;
-                        case 'patientName':
-                            patientName = value.trim();
-                            break;
-                        case 'hospDate':
-                            hospDate = value.trim();
-                            break;
-                        default:
-                            break;
-                    }
+        // חילוץ הפרמטרים מתוך המחרוזת המפוענחת
+        decodedString.split('&').forEach(pair => {
+            const [key, value] = pair.split('=');
+            if (key && value) {
+                // שימו לב: מניחים שהשמות הם בדיוק כמו ב-SQL (case-sensitive)
+                switch (key.trim()) {
+                    case 'hospitalization':
+                        hosp = value.trim();
+                        break;
+                    case 'amount':
+                        amount = value.trim();
+                        break;
+                    case 'patientName':
+                        patientName = value.trim();
+                        break;
+                    case 'hospDate':
+                        hospDate = value.trim();
+                        break;
+                    default:
+                        break;
                 }
-            });
+            }
+        });
 
-        } catch (e) {
-            console.error("שגיאה בפענוח Base64 או חילוץ פרמטרים:", e);
-        }
+    } catch (e) {
+        console.error("שגיאה בפענוח Base64 או חילוץ פרמטרים:", e);
     }
+}
 
 
     // בדיקת חובה לאחר ניסיון הפענוח
