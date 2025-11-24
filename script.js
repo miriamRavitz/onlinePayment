@@ -8,48 +8,49 @@ document.addEventListener('DOMContentLoaded', function () {
     let patientName = '';
     let hospDate = '';
 
-    if (encodedData) {
-    try {
-        // 1. פענוח Base64 רגיל (מחזיר מחרוזת עם תווי NULL בגלל UTF-16)
-        const utf16String = atob(encodedData); 
-        
-        // 2. הסרת תווי NULL (בייט האפס) בין התווים
+  if (encodedData) {
         let decodedString = '';
-        for (let i = 0; i < utf16String.length; i += 2) {
-            // התווים ב-UTF-16 הם זוגות, כשהבייט השני הוא אפס.
-            // לוקחים רק את הבייט הראשון (התו האמיתי)
-            decodedString += utf16String.charAt(i);
-        }
-
-        // 3. עכשיו שיש לנו את המחרוזת הנקייה (עם עברית תקינה), ממשיכים בחילוץ
-        decodedString.split('&').forEach(pair => {
-
-            const [key, value] = pair.split('=');
-            if (key && value) {
-                // שימו לב: מניחים שהשמות הם בדיוק כמו ב-SQL (case-sensitive)
-                switch (key.trim()) {
-                    case 'hospitalization':
-                        hosp = value.trim();
-                        break;
-                    case 'amount':
-                        amount = value.trim();
-                        break;
-                    case 'patientName':
-                        patientName = value.trim();
-                        break;
-                    case 'hospDate':
-                        hospDate = value.trim();
-                        break;
-                    default:
-                        break;
-                }
+        try {
+            // *** 1. תיקון שגיאת התחביר: השורה הפכה לשורה אחת נקייה ***
+            
+            // 2. פענוח Base64 רגיל (מחזיר מחרוזת עם תווי NULL בגלל UTF-16)
+            const utf16String = atob(encodedData); 
+            
+            // 3. הסרת תווי NULL (בייט האפס) בין התווים כדי לקבל את המחרוזת הנקייה
+            for (let i = 0; i < utf16String.length; i += 2) {
+                // לוקחים רק את הבייט הראשון מכל זוג
+                decodedString += utf16String.charAt(i);
             }
-        });
+            
+            // 4. חילוץ הפרמטרים מתוך המחרוזת המפוענחת
+            decodedString.split('&').forEach(pair => {
+                const [key, value] = pair.split('=');
+                if (key && value) {
+                    // שימו לב: מניחים שהשמות הם בדיוק כמו ב-SQL (case-sensitive)
+                    switch (key.trim()) {
+                        case 'hospitalization':
+                            hosp = value.trim();
+                            break;
+                        case 'amount':
+                            amount = value.trim();
+                            break;
+                        case 'patientName':
+                            // פענוח ה-URL Encoded הנותר בשם (בגלל שהפעולה נעשתה דרך SQL)
+                            patientName = decodeURIComponent(value.trim()); 
+                            break;
+                        case 'hospDate':
+                            hospDate = value.trim();
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            });
 
-    } catch (e) {
-        console.error("שגיאה בפענוח Base64 או חילוץ פרמטרים:", e);
+        } catch (e) {
+            console.error("שגיאה בפענוח Base64 או חילוץ פרמטרים:", e);
+        }
     }
-}
 
     // בדיקת חובה לאחר ניסיון הפענוח
     if (!hosp || !amount || !patientName || !hospDate) {
