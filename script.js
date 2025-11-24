@@ -71,10 +71,10 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('patientName').textContent = patientName;
 
     // ניקוי ה־URL מהפרמטרים (נשאר זהה)
-    if (history.replaceState) {
+ //   if (history.replaceState) {
         // מנקה את ה-URL מכל פרמטר (כולל 'data')
-        history.replaceState({}, document.title, window.location.pathname);
-    }
+//        history.replaceState({}, document.title, window.location.pathname);
+//    }
 
     // כתובת iframe של טרנזילה (נשאר זהה)
     const baseUrl = 'https://direct.tranzila.com/szmctest/iframe.php?lang=il&cred_type=1&currency=1';
