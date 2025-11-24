@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function () {
             console.error("שגיאה קריטית בפענוח Base64:", e);
         }
     }
-    
+   
      // בדיקת חובה לאחר ניסיון הפענוח
     if (!hosp || !amount || !patientName || !hospDate) {
         document.body.innerHTML = `
