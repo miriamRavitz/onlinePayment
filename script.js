@@ -13,18 +13,17 @@ document.addEventListener('DOMContentLoaded', function () {
             // 1. פענוח Base64 רגיל (מכיל UTF-16)
             const utf16String = atob(encodedData); 
             
-            // 2. טיפול ב-BOM (Byte Order Mark) ובייטי NULL
+            // 2. הסרת BOM ותווי NULL (מנקה את ה-UTF-16)
             let startIndex = 0;
             if (utf16String.length >= 2 && utf16String.charCodeAt(0) === 255 && utf16String.charCodeAt(1) === 254) {
                  startIndex = 2; // דילוג על BOM
             } 
 
-            // 3. הסרת תווי NULL (בייט האפס) והמשך החל מה-startIndex
             for (let i = startIndex; i < utf16String.length; i += 2) {
                 decodedString += utf16String.charAt(i);
             }
             
-            // 4. חילוץ הפרמטרים מתוך המחרוזת הנקייה
+            // 3. חילוץ הפרמטרים מתוך המחרוזת הנקייה
             decodedString.split('&').forEach(pair => {
                 const [key, value] = pair.split('=');
                 if (key && value) {
@@ -35,39 +34,24 @@ document.addEventListener('DOMContentLoaded', function () {
                         case 'amount':
                             amount = value.trim();
                             break;
-                   case 'patientName':
+                        case 'patientName':
                             const rawValue = value.trim();
                             
-                            // *** 1. בדיקה אם הקידוד נראה כמו קידוד URI תקין (URL-Encoded) ***
-                            if (rawValue.includes('%')) {
-                                // אם יש %, ננסה לפענח כ-URI. הפתרון המקורי עבד אצלך רק כשלא הייתה שגיאה
-                                try {
-                                    patientName = decodeURIComponent(rawValue);
-                                } catch (e) {
-                                    // אם עדיין נכשל (URI malformed), נחזור לטיפול כגיבריש
-                                    patientName = rawValue;
-                                }
-                            } 
-                            // *** 2. טיפול בגיבריש (הימנעות מ-decodeURIComponent) ***
-                            else {
-                                try {
-                                    // המרה מפורשת מ-ISO-8859-8 (או דומה) ל-UTF-8
-                                    const bytes = Array.from(rawValue, c => c.charCodeAt(0));
-                                    // יצירת מחרוזת מ-bytes, ואז שימוש ב-TextDecoder
-                                    const isoString = String.fromCharCode.apply(null, bytes);
-                                    
-                                    // יצירת מערך בייטים חדש
-                                    const encoder = new TextEncoder();
-                                    const utf8Bytes = encoder.encode(isoString);
-                                    
-                                    // פענוח חזרה כ-UTF-8
-                                    const decoder = new TextDecoder('windows-1255'); // קידוד עברית נפוץ
-                                    patientName = decoder.decode(utf8Bytes);
-                                } catch (e) {
-                                    // נכשל כל הניסיון, נשתמש בערך הגולמי
-                                    patientName = rawValue;
-                                    console.error("שגיאה סופית בהמרת שם המטופל.", e);
-                                }
+                            // *** הפתרון הסופי ביותר לגיבריש (Windows-1255/ISO) ***
+                            // נשתמש ב-TextDecoder כדי לעקוף את בעיות הקידוד
+                            try {
+                                const bytes = Array.from(rawValue, c => c.charCodeAt(0));
+                                // המרה למחרוזת שבה ה-bytes מפורשים כ-ISO
+                                const isoString = String.fromCharCode.apply(null, bytes);
+                                
+                                // פענוח מפורש מ-windows-1255 (הקידוד הנפוץ לעברית ישנה)
+                                const decoder = new TextDecoder('windows-1255');
+                                // קידוד המחרוזת חזרה לבייטים, ואז פענוח כ-windows-1255
+                                const encoder = new TextEncoder();
+                                patientName = decoder.decode(encoder.encode(isoString));
+                            } catch (e) {
+                                patientName = rawValue;
+                                console.error("שגיאה סופית בטיפול בקידוד השם.", e);
                             }
                             break;
                         case 'hospDate':
@@ -80,10 +64,19 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
         } catch (e) {
+            // בלוק ה-catch שחסר לך (מטפל בשגיאות Base64)
             console.error("שגיאה בפענוח Base64 או חילוץ פרמטרים:", e);
         }
     }
     
+    // 5. הצגת הנתונים בדף
+    document.getElementById('patientName').textContent = patientName;
+    document.getElementById('amount').textContent = amount;
+    document.getElementById('hospitalizationNumber').textContent = hosp; 
+    document.getElementById('hospDate').textContent = hospDate;
+
+    // ... המשך קוד הדף שלך
+});
 
     // בדיקת חובה לאחר ניסיון הפענוח
     if (!hosp || !amount || !patientName || !hospDate) {
@@ -95,12 +88,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return; // מפסיק את המשך ההרצה
     }
 
-    // הצגת פרטים בכותרת (החלק הזה נשאר זהה)
-    document.getElementById('hospitalizationNumber').textContent = hosp;
-    document.getElementById('hospDate').textContent = hospDate;
-    document.getElementById('amount').textContent = amount;
-    document.getElementById('patientName').textContent = patientName;
-
+  
     // ניקוי ה־URL מהפרמטרים (נשאר זהה)
  //   if (history.replaceState) {
         // מנקה את ה-URL מכל פרמטר (כולל 'data')
