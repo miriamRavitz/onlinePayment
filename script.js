@@ -35,30 +35,38 @@ document.addEventListener('DOMContentLoaded', function () {
                         case 'amount':
                             amount = value.trim();
                             break;
-                       case 'patientName':
+                   case 'patientName':
                             const rawValue = value.trim();
                             
-                            // *** 1. בדיקה אם המחרוזת כבר URL-Encoded (הדרך הנכונה יותר) ***
+                            // *** 1. בדיקה אם הקידוד נראה כמו קידוד URI תקין (URL-Encoded) ***
                             if (rawValue.includes('%')) {
+                                // אם יש %, ננסה לפענח כ-URI. הפתרון המקורי עבד אצלך רק כשלא הייתה שגיאה
                                 try {
-                                    // מנסים לפענח כ-URL-Encoded רגיל (UTF-8)
                                     patientName = decodeURIComponent(rawValue);
                                 } catch (e) {
-                                    // אם נכשל, זהו רצף URI שבור. נשתמש בערך הגולמי
+                                    // אם עדיין נכשל (URI malformed), נחזור לטיפול כגיבריש
                                     patientName = rawValue;
-                                    console.error("שגיאה בפענוח URI של שם המטופל.", e);
                                 }
                             } 
-                            // *** 2. אם אין קידוד URL, מניחים שהוא גיבריש (Windows-1255/ISO) ***
+                            // *** 2. טיפול בגיבריש (הימנעות מ-decodeURIComponent) ***
                             else {
                                 try {
-                                    // אילוץ המרה מקידוד ישן ל-UTF-8 כדי לפתור את הגיבריש
+                                    // המרה מפורשת מ-ISO-8859-8 (או דומה) ל-UTF-8
                                     const bytes = Array.from(rawValue, c => c.charCodeAt(0));
-                                    patientName = decodeURIComponent(bytes.map(b => `%${b.toString(16).padStart(2, '0')}`).join(''));
+                                    // יצירת מחרוזת מ-bytes, ואז שימוש ב-TextDecoder
+                                    const isoString = String.fromCharCode.apply(null, bytes);
+                                    
+                                    // יצירת מערך בייטים חדש
+                                    const encoder = new TextEncoder();
+                                    const utf8Bytes = encoder.encode(isoString);
+                                    
+                                    // פענוח חזרה כ-UTF-8
+                                    const decoder = new TextDecoder('windows-1255'); // קידוד עברית נפוץ
+                                    patientName = decoder.decode(utf8Bytes);
                                 } catch (e) {
-                                    // אם נכשל, נשתמש בערך הגולמי
+                                    // נכשל כל הניסיון, נשתמש בערך הגולמי
                                     patientName = rawValue;
-                                    console.error("שגיאה בהמרת שם המטופל ל-UTF-8 סופי.", e);
+                                    console.error("שגיאה סופית בהמרת שם המטופל.", e);
                                 }
                             }
                             break;
