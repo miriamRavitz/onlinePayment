@@ -8,22 +8,24 @@ document.addEventListener('DOMContentLoaded', function () {
     const encodedData = urlParams.get('data');
 
     if (encodedData) {
-        let decodedString = '';
         try {
-            // 1. פענוח Base64 רגיל (מכיל UTF-16)
+            // 1. פענוח Base64 רגיל (מחזיר מחרוזת עם תווי NULL מ-UTF-16)
             const utf16String = atob(encodedData); 
+            let decodedString = '';
             
-            // 2. הסרת BOM ותווי NULL (מנקה את ה-UTF-16)
+            // 2. טיפול ב-BOM והסרת תווי NULL (פענוח UTF-16)
             let startIndex = 0;
+            // בדיקת BOM של UTF-16
             if (utf16String.length >= 2 && utf16String.charCodeAt(0) === 255 && utf16String.charCodeAt(1) === 254) {
-                 startIndex = 2; // דילוג על BOM
+                 startIndex = 2;
             } 
 
+            // הסרת תווי NULL (בייט האפס)
             for (let i = startIndex; i < utf16String.length; i += 2) {
                 decodedString += utf16String.charAt(i);
             }
             
-            // 3. חילוץ הפרמטרים מתוך המחרוזת הנקייה
+            // 3. חילוץ פרמטרים
             decodedString.split('&').forEach(pair => {
                 const [key, value] = pair.split('=');
                 if (key && value) {
@@ -35,23 +37,16 @@ document.addEventListener('DOMContentLoaded', function () {
                             amount = value.trim();
                             break;
                         case 'patientName':
-                            const rawValue = value.trim();
-                            
-                            // *** הפתרון הסופי ביותר לגיבריש (Windows-1255/ISO) ***
-                            // נשתמש ב-TextDecoder כדי לעקוף את בעיות הקידוד
-                            try {
-                                const bytes = Array.from(rawValue, c => c.charCodeAt(0));
-                                // המרה למחרוזת שבה ה-bytes מפורשים כ-ISO
-                                const isoString = String.fromCharCode.apply(null, bytes);
-                                
-                                // פענוח מפורש מ-windows-1255 (הקידוד הנפוץ לעברית ישנה)
-                                const decoder = new TextDecoder('windows-1255');
-                                // קידוד המחרוזת חזרה לבייטים, ואז פענוח כ-windows-1255
-                                const encoder = new TextEncoder();
-                                patientName = decoder.decode(encoder.encode(isoString));
-                            } catch (e) {
-                                patientName = rawValue;
-                                console.error("שגיאה סופית בטיפול בקידוד השם.", e);
+                            // ננסה לפענח URI רק אם נראה URL-encoded, אחרת נשאיר כפי שהוא (גיבריש)
+                            if (value.includes('%')) {
+                                try {
+                                    patientName = decodeURIComponent(value.trim());
+                                } catch (e) {
+                                    patientName = value.trim(); // אם נכשל decode, נשאיר את הערך
+                                }
+                            } else {
+                                // אם זה הגיבריש הישיר, נשאיר אותו גולמי.
+                                patientName = value.trim(); 
                             }
                             break;
                         case 'hospDate':
@@ -64,21 +59,12 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
         } catch (e) {
-            // בלוק ה-catch שחסר לך (מטפל בשגיאות Base64)
-            console.error("שגיאה בפענוח Base64 או חילוץ פרמטרים:", e);
+            // אם הפענוח הבסיסי נכשל, נרשום את השגיאה
+            console.error("שגיאה קריטית בפענוח Base64:", e);
         }
     }
     
-    // 5. הצגת הנתונים בדף
-    document.getElementById('patientName').textContent = patientName;
-    document.getElementById('amount').textContent = amount;
-    document.getElementById('hospitalizationNumber').textContent = hosp; 
-    document.getElementById('hospDate').textContent = hospDate;
-
-    // ... המשך קוד הדף שלך
-});
-
-    // בדיקת חובה לאחר ניסיון הפענוח
+     // בדיקת חובה לאחר ניסיון הפענוח
     if (!hosp || !amount || !patientName || !hospDate) {
         document.body.innerHTML = `
             <div style="text-align: center; padding: 40px; font-size: 1.4em; color: darkred;">
