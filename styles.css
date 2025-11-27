@@ -261,7 +261,27 @@ footer img {
 
 
 @media (max-width: 700px) {
-  body {
+  .grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .grid .label,
+  .grid .val {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    white-space: nowrap;
+    font-size: 16px;
+  }
+
+  .grid .label::after {
+    content: ":";
+    margin-right: 0.3em;
+  }
+
+    body {
     font-size: 16px;
     padding: 10px;
   }
