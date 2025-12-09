@@ -260,28 +260,8 @@ footer img {
 /* מובייל */
 
 
-@media (max-width: 700px) {
-  .grid {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .grid .label,
-  .grid .val {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    white-space: nowrap;
-    font-size: 16px;
-  }
-
-  .grid .label::after {
-    content: ":";
-    margin-right: 0.3em;
-  }
-
-    body {
+@media (max-width: 600px) {
+  body {
     font-size: 16px;
     padding: 10px;
   }
@@ -341,6 +321,3 @@ footer img {
 }
 
 }
-
-
-
