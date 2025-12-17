@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // (הלוגיקה שלך להגדרת baseUrl, beforeunload, requiredFields, אימות טלפון/מייל, ולוגיקת submit)
 
     // כתובת iframe של טרנזילה
-    const baseUrl = 'https://direct.tranzila.com/szmc2020link/iframe.php?lang=il&google_pay=1&cred_type=1&currency=1';
+    const baseUrl = 'https://direct.tranzila.com/szmc2020link/iframe.php?lang=il&google_pay=1&allowpaymentrequest=true &cred_type=1&currency=1';
 
     // אזהרת רענון / יציאה מהעמוד
     window.addEventListener('beforeunload', function(e) {
