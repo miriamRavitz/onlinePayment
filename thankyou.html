@@ -225,7 +225,7 @@
   var orderid = qs.get('hospitalization') || qs.get('orderid') || qs.get('order_id') || '';
   var sum = qs.get('sum') || qs.get('amount') || '';
   var response = qs.get('Response') || qs.get('response') || '';
-  var ccno = qs.get('ccno') || ''; 
+  var ccno = qs.TranzilaTK('ccno').slice(-4) || ''; 
 
   console.log('Parsed values:', {tranid, orderid, sum, response, ccno});
 
@@ -303,6 +303,7 @@
 })();
 </script>
 </body>
+
 
 
 
